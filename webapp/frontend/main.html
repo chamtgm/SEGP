@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Analyzer</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>AI Image Analyzer</h1>
+        </header>
+        
+        <main>
+            <div class="upload-section">
+                <div class="buttons">
+                    <label for="file" class="upload-button">
+                        Choose File
+                        <input type="file" id="file" accept="image/*">
+                    </label>
+                    <button id="cameraButton" class="camera-button">
+                        Take Photo
+                    </button>
+                </div>
+
+                <div class="preview-container">
+                    <video id="camera" autoplay playsinline style="display: none"></video>
+                    <img id="preview" alt="Preview">
+                    <div class="camera-controls" style="display: none">
+                        <button id="captureButton" class="capture-button">📸 Capture</button>
+                        <button id="retakeButton" class="retake-button">↺ Retake</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section">
+                <h2>Analysis Results</h2>
+                <pre id="result"></pre>
+                <div class="heatmap-controls" style="margin-top:10px">
+                    <label><input type="checkbox" id="heatmapColor"> Colored heatmap (OpenCV)</label>
+                    <!-- Mode selector removed: frontend always requests server's standardized heatmap -->
+                    <label style="margin-left:8px">Colormap:
+                        <select id="heatmapColormap">
+                            <option value="jet">jet</option>
+                            <option value="hot">hot</option>
+                            <option value="viridis">viridis</option>
+                            <option value="plasma">plasma</option>
+                            <option value="magma">magma</option>
+                            <option value="inferno">inferno</option>
+                            <option value="gray">gray</option>
+                        </select>
+                    </label>
+                    <button id="genHeatmap" style="margin-left:8px">Generate Heatmap</button>
+                </div>
+                <div style="margin-top:8px">
+                    <img id="heatmapPreview" alt="Heatmap Preview" style="max-width:100%; display:none; border:1px solid #ccc; margin-top:8px">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const backend = 'http://localhost:3000';
+        const camera = document.getElementById('camera');
+        const preview = document.getElementById('preview');
+        const cameraButton = document.getElementById('cameraButton');
+        const captureButton = document.getElementById('captureButton');
+        const retakeButton = document.getElementById('retakeButton');
+        const cameraControls = document.querySelector('.camera-controls');
+        let stream = null;
+
+        // Check if camera is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            cameraButton.style.display = 'none';
+            console.warn('Camera not supported');
+        }
+
+        // File upload handler
+        document.getElementById('file').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await handleImage(file);
+        };
+
+        // Camera handlers
+        cameraButton.onclick = async () => {
+            try {
+                // Try rear camera first on mobile
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                camera.srcObject = stream;
+                camera.style.display = 'block';
+                preview.style.display = 'none';
+                cameraControls.style.display = 'flex';
+
+                // Wait for video to be ready
+                await new Promise((resolve) => {
+                    camera.onloadedmetadata = () => {
+                        camera.play().then(resolve);
+                    };
+                });
+
+            } catch (err) {
+                console.error('Camera error:', err);
+                alert('Camera access denied or error: ' + err.message);
+            }
+        };
+
+        captureButton.onclick = () => {
+            if (!camera.videoWidth) {
+                alert('Camera not ready yet. Please wait.');
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = camera.videoWidth;
+            canvas.height = camera.videoHeight;
+            canvas.getContext('2d').drawImage(camera, 0, 0);
+            
+            canvas.toBlob(async (blob) => {
+                if (!blob) {
+                    alert('Failed to capture image');
+                    return;
+                }
+                await handleImage(blob);
+                stopCamera();
+            }, 'image/jpeg', 0.95); // High quality JPEG
+        };
+
+        retakeButton.onclick = () => {
+            camera.style.display = 'block';
+            preview.style.display = 'none';
+        };
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            camera.style.display = 'none';
+            preview.style.display = 'block';
+            cameraControls.style.display = 'none';
+        }
+
+        async function handleImage(blob) {
+            // Show preview
+            const url = URL.createObjectURL(blob);
+            preview.src = url;
+            preview.style.display = 'block';
+            camera.style.display = 'none';
+
+            // Upload to backend
+            const form = new FormData();
+            form.append('photo', blob, 'photo.jpg');
+            
+            try {
+                document.getElementById('result').textContent = 'Analyzing...';
+                const res = await fetch(`${backend}/upload-form`, {
+                    method: 'POST',
+                    body: form
+                });
+                const json = await res.json();
+                document.getElementById('result').textContent = JSON.stringify(json, null, 2);
+                // Save last image blob for heatmap generation
+                window._lastImageBlob = blob;
+                document.getElementById('genHeatmap').style.display = 'inline-block';
+            } catch (err) {
+                document.getElementById('result').textContent = String(err);
+            }
+        }
+
+        // Heatmap generation
+        document.getElementById('genHeatmap').onclick = async () => {
+            const blob = window._lastImageBlob;
+            if (!blob) { alert('No image available. Upload or capture first.'); return; }
+            const useCv = document.getElementById('heatmapColor').checked;
+            const cmap = document.getElementById('heatmapColormap').value || 'jet';
+            // Standardized: no mode selection. Always request the server's Grad-CAM heatmap.
+            const patchParams = '';
+
+            const form = new FormData();
+            form.append('photo', blob, 'photo.jpg');
+
+            try {
+                document.getElementById('result').textContent = 'Generating heatmap...';
+                const q = useCv ? `?cv=1&colormap=${encodeURIComponent(cmap)}` : '';
+                const url = `${backend}/model/heatmap${q}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    body: form
+                });
+                const data = await res.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                if (data) {
+                    // Do not show heatmap preview in the frontend per user preference.
+                    // Instead, display returned metadata and server-side paths (if any).
+                    const info = Object.assign({}, data);
+                    // remove large base64 payloads from display
+                    if (info.heatmap_base64) delete info.heatmap_base64;
+                    if (info.overlay_base64) delete info.overlay_base64;
+                    let msg = JSON.stringify(info, null, 2);
+                    if (data.temperature_stats) {
+                        const stats = data.temperature_stats;
+                        msg += '\n\nTemperature stats — min: ' + stats.min.toFixed(3) + ', max: ' + stats.max.toFixed(3) + ', mean: ' + stats.mean.toFixed(3);
+                    }
+                    if (data.overlay_path) {
+                        msg += '\n\nOverlay saved at: ' + data.overlay_path;
+                    } else if (data.heatmap_path) {
+                        msg += '\n\nHeatmap saved at: ' + data.heatmap_path;
+                    }
+                    document.getElementById('result').textContent = msg;
+                }
+            } catch (err) {
+                document.getElementById('result').textContent = String(err);
+            }
+        };
+    </script>
+</body>
+</html>

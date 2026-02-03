@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Analyzer</title>
+    <style>
+        #preview { max-width: 300px; }
+        pre { background: #f0f0f0; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Image Analyzer</h1>
+    <input type="file" id="file" accept="image/*">
+    <div style="display:flex;gap:16px;align-items:flex-start;margin-top:12px;">
+        <div>
+            <div>Original</div>
+            <img id="preview" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff">
+        </div>
+        <div>
+            <div>Heatmap</div>
+            <img id="heatmap" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff">
+        </div>
+    </div>
+    <pre id="result"></pre>
+    <script>
+        const backend = 'http://localhost:3000';
+        document.getElementById('file').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = e => document.getElementById('preview').src = e.target.result;
+            reader.readAsDataURL(file);
+
+            // Upload to backend and request heatmap
+            const form = new FormData();
+            form.append('photo', file);
+
+            // Show immediate uploading state
+            document.getElementById('result').textContent = 'Processing...';
+            document.getElementById('heatmap').src = '';
+
+            try {
+                // Call the model heatmap endpoint on the Node backend which forwards to Python
+                const res = await fetch(`${backend}/model/heatmap`, {
+                    method: 'POST',
+                    body: form
+                });
+                const json = await res.json();
+                document.getElementById('result').textContent = JSON.stringify(json, null, 2);
+
+                if (json.heatmap_base64) {
+                    // Display heatmap as data URL
+                    document.getElementById('heatmap').src = 'data:image/png;base64,' + json.heatmap_base64;
+                } else if (json.heatmap_path) {
+                    // If backend returns a server path, display via Node static route if configured
+                    document.getElementById('heatmap').alt = json.heatmap_path;
+                } else if (json.error) {
+                    document.getElementById('result').textContent = 'Error: ' + json.error;
+                }
+            } catch (err) {
+                document.getElementById('result').textContent = String(err);
+            }
+        };
+    </script>
+</body>
+</html>
