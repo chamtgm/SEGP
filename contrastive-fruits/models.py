@@ -10,15 +10,24 @@ import importlib.util
 import os
 
 _here = os.path.dirname(__file__)
-_resnet_path = os.path.join(_here, 'contrastive-fruits', 'ResNet.py')
-if os.path.exists(_resnet_path):
-    spec = importlib.util.spec_from_file_location('cf_resnet', _resnet_path)
-    _cf = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(_cf)
-    # re-export get_backbone if present
-    if hasattr(_cf, 'get_backbone'):
-        get_backbone = getattr(_cf, 'get_backbone')
-    else:
-        raise ImportError(f'get_backbone not found in {_resnet_path}')
+# Search common locations for the ResNet implementation to support different repo layouts
+_candidates = [
+    os.path.join(_here, 'ResNet.py'),
+    os.path.join(_here, 'contrastive-fruits', 'ResNet.py')
+]
+_resnet_path = None
+for p in _candidates:
+    if os.path.exists(p):
+        _resnet_path = p
+        break
+if _resnet_path is None:
+    raise ImportError(f'ResNet implementation not found; tried: {", ".join(_candidates)}')
+
+spec = importlib.util.spec_from_file_location('cf_resnet', _resnet_path)
+_cf = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(_cf)
+# re-export get_backbone if present
+if hasattr(_cf, 'get_backbone'):
+    get_backbone = getattr(_cf, 'get_backbone')
 else:
-    raise ImportError(f'ResNet implementation not found at {_resnet_path}')
+    raise ImportError(f'get_backbone not found in {_resnet_path}')
