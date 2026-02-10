@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Image Analyzer</title>
     <link rel="stylesheet" href="main.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,60 +17,99 @@
             <div class="upload-section">
                 <div class="buttons">
                     <label for="file" class="upload-button">
-                        Choose File
+                        Image🖼️ 
                         <input type="file" id="file" accept="image/*">
                     </label>
                     <button id="cameraButton" class="camera-button">
-                        Take Photo
+                        Capture📸
                     </button>
                 </div>
 
                 <div class="preview-container">
                     <video id="camera" autoplay playsinline style="display: none"></video>
-                    <img id="preview" alt="Preview">
+                    <div style="display:flex;gap:16px;align-items:flex-start;">
+                        <div>
+                            <img id="preview" style="max-width:320px;display:block">
+                        </div>
+                        <div>
+                            <img id="heatmap" style="max-width:320px;display:none;border:1px solid #ddd;padding:4px;background:#fff">
+                        </div>
+                    </div>
                     <div class="camera-controls" style="display: none">
                         <button id="captureButton" class="capture-button">📸 Capture</button>
+                         <button id="stopButton" class="stop-button">⏸️ Stop Camera</button>
                         <button id="retakeButton" class="retake-button">↺ Retake</button>
                     </div>
                 </div>
             </div>
 
-            <div class="result-section">
-                <h2>Analysis Results</h2>
-                <pre id="result"></pre>
-                <div class="heatmap-controls" style="margin-top:10px">
-                    <label><input type="checkbox" id="heatmapColor"> Colored heatmap (OpenCV)</label>
-                    <!-- Mode selector removed: frontend always requests server's standardized heatmap -->
-                    <label style="margin-left:8px">Colormap:
-                        <select id="heatmapColormap">
-                            <option value="jet">jet</option>
-                            <option value="hot">hot</option>
-                            <option value="viridis">viridis</option>
-                            <option value="plasma">plasma</option>
-                            <option value="magma">magma</option>
-                            <option value="inferno">inferno</option>
-                            <option value="gray">gray</option>
-                        </select>
-                    </label>
-                    <button id="genHeatmap" style="margin-left:8px">Generate Heatmap</button>
-                </div>
-                <div style="margin-top:8px">
-                    <img id="heatmapPreview" alt="Heatmap Preview" style="max-width:100%; display:none; border:1px solid #ccc; margin-top:8px">
-                </div>
-            </div>
+           <div class="result-section">
+  <h2>Analysis Results</h2>
+
+  <div id="progress-container" style="display:none; margin-bottom: 10px;">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <small id="progress-text">Analyzing image...</small>
+  </div>
+
+  <div class="heatmap-controls" style="margin-bottom:10px">
+    <label><h4><input type="checkbox" id="heatmapColor" checked> Colored heatmap (OpenCV)</label>
+    <label style="margin-left:8px">Colormap:
+      <select id="heatmapColormap">
+        <option value="jet" selected>jet</option>
+        <option value="hot">hot</option>
+        <option value="viridis">viridis</option>
+        <option value="plasma">plasma</option>
+        <option value="magma">magma</option>
+        <option value="inferno">inferno</option>
+        <option value="gray">gray</option>
+      </select>
+    </label>
+    <label style="margin-left:8px">Overlay: <input type="number" id="heatmapAlpha" min="0" max="1" step="0.1" value="0.7" style="width:48px"></label><br>
+    <input type="checkbox" id="tsnePopup" checked> Show t-SNE popup (500 samples)</label>
+</h4>
+  </div>
+
+  <pre id="result"></pre>
+  <canvas id="chart" style="max-width: 600px; margin-top: 20px;"></canvas>
+</div>
+
+<div class="sidebar">
+<button id="toggleSidebar" class="toggle-btn">☰</button>
+  <a href="history.html">📜History</a>
+  <a href="theme.html">🖼Theme</a>
+  <a href="about.html">⚙ About</a>
+</div>
+
+
+<!-- Page content -->
+<div class="content">
+  ..
+</div>
+
         </main>
     </div>
 
     <script>
-        const backend = 'http://localhost:3000';
+        let chartInstance = null;
+        // Python backend (8001). Set to 3000 and useNodeBackend true if you run the Node backend.
+        const backend = 'http://127.0.0.1:8001';
+        const useNodeBackend = false; // true: POST /upload-form + /model/heatmap (FormData); false: POST /nn + /heatmap (blob)
         const camera = document.getElementById('camera');
         const preview = document.getElementById('preview');
         const cameraButton = document.getElementById('cameraButton');
         const captureButton = document.getElementById('captureButton');
+        const stopButton = document.getElementById('stopButton');
         const retakeButton = document.getElementById('retakeButton');
         const cameraControls = document.querySelector('.camera-controls');
+        const toggleBtn = document.getElementById("toggleSidebar");
+        const sidebar = document.querySelector(".sidebar");
         let stream = null;
 
+        toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
         // Check if camera is supported
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             cameraButton.style.display = 'none';
@@ -135,6 +175,11 @@
             }, 'image/jpeg', 0.95); // High quality JPEG
         };
 
+        // Stop camera manually
+        stopButton.onclick = () => {
+        stopCamera();
+        };
+
         retakeButton.onclick = () => {
             camera.style.display = 'block';
             preview.style.display = 'none';
@@ -149,6 +194,7 @@
             preview.style.display = 'block';
             cameraControls.style.display = 'none';
         }
+        
 
         async function handleImage(blob) {
             // Show preview
@@ -156,72 +202,381 @@
             preview.src = url;
             preview.style.display = 'block';
             camera.style.display = 'none';
+            // Save a small thumbnail for History page (localStorage)
+            try { await saveToLocalHistory(blob); } catch (e) { /* ignore */ }
 
-            // Upload to backend
-            const form = new FormData();
-            form.append('photo', blob, 'photo.jpg');
-            
             try {
                 document.getElementById('result').textContent = 'Analyzing...';
-                const res = await fetch(`${backend}/upload-form`, {
-                    method: 'POST',
-                    body: form
-                });
-                const json = await res.json();
-                document.getElementById('result').textContent = JSON.stringify(json, null, 2);
-                // Save last image blob for heatmap generation
-                window._lastImageBlob = blob;
-                document.getElementById('genHeatmap').style.display = 'inline-block';
+                let json;
+                if (useNodeBackend) {
+                    const form = new FormData();
+                    form.append('photo', blob, 'photo.jpg');
+                    const res = await fetch(`${backend}/upload-form`, { method: 'POST', body: form });
+                    json = await res.json();
+                    if (json.error) {
+                        document.getElementById('result').textContent = 'Error: ' + json.error;
+                        return;
+                    }
+                    json = { ...json, labels: json.analysis?.labels ?? null, tsne_coordinates: json.analysis?.tsne_coordinates ?? null, nn: json.analysis?.nn?.nn ?? json.analysis?.nn };
+                } else {
+                    const tsnePopup = document.getElementById('tsnePopup');
+                    const tsneParam = (tsnePopup && tsnePopup.checked) ? '1' : '0';
+                    const res = await fetch(`${backend}/nn?k=5&tsne_plot=${tsneParam}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/octet-stream' },
+                        body: blob
+                    });
+                    json = await res.json();
+                    if (json.error) {
+                        document.getElementById('result').textContent = 'Error: ' + json.error;
+                        return;
+                    }
+                }
+                // Normalize into labels array: [{description, confidence}]
+                const labels = Array.isArray(json?.labels) ? json.labels : (Array.isArray(json?.nn) ? json.nn.map(n => ({ description: n.path, confidence: n.score })) : []);
+                console.log('[FRONTEND] Response:', json);
+                const tsne = json?.tsne_coordinates ?? json?.analysis?.tsne_coordinates ?? null;
+                console.log('[FRONTEND] Has tsne_coordinates?', !!tsne);
+                console.log('[FRONTEND] tsne_coordinates:', tsne);
+                if (Array.isArray(labels) && labels.length) {
+                    // Prefer t-SNE visualization when available
+                    if (tsne?.input && Array.isArray(tsne?.neighbors)) {
+                        console.log('[FRONTEND] Using t-SNE chart');
+                        showTsneChart(tsne);
+                    } else {
+                        console.log('[FRONTEND] Using bar chart (fallback)');
+                        // Fallback
+                        showBarChart(labels);
+                    }
+                    document.getElementById('result').textContent = formatLabelsForDisplay(labels);
+
+                    // Always request heatmap from the Python backend after analysis,
+                    // using the same image bytes and user-selected heatmap options.
+                    try {
+                        const heatImgEl = document.getElementById('heatmap');
+                        if (heatImgEl) {
+                            const useCv = document.getElementById('heatmapColor').checked;
+                            const cmap = (document.getElementById('heatmapColormap').value || 'jet');
+                            const alpha = (document.getElementById('heatmapAlpha').value || '0.7');
+                            const qs = new URLSearchParams();
+                            if (useCv) qs.set('cv', '1');
+                            qs.set('colormap', cmap);
+                            qs.set('alpha', alpha);
+                            let heatRes;
+                            if (useNodeBackend) {
+                                const heatForm = new FormData();
+                                heatForm.append('photo', blob, 'photo.jpg');
+                                heatRes = await fetch(`${backend}/model/heatmap?${qs.toString()}`, { method: 'POST', body: heatForm });
+                            } else {
+                                heatRes = await fetch(`${backend}/heatmap?${qs.toString()}`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/octet-stream' },
+                                    body: blob
+                                });
+                            }
+                            if (heatRes.ok) {
+                                const heatJson = await heatRes.json();
+                                const heatmapB64 = heatJson.heatmap_base64;
+                                const overlay = heatJson.overlay_base64;
+
+                                // Use overlay first so the output looks like a weather-style map;
+                                // fall back to pure heatmap if overlay is missing.
+                                const data = overlay || heatmapB64 || null;
+                                if (data) {
+                                    const url = 'data:image/png;base64,' + data;
+                                    // Open heatmap in a new tab/pop-up
+                                    window.open(url, '_blank');
+                                    // Keep inline <img> hidden so it does not sit beside preview
+                                    heatImgEl.src = url;
+                                    heatImgEl.style.display = 'none';
+                                } else {
+                                    heatImgEl.style.display = 'none';
+                                }
+                            } else {
+                                console.warn('Heatmap request failed with status', heatRes.status);
+                                heatImgEl.style.display = 'none';
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Failed to show heatmap:', e);
+                    }
+                }
+
             } catch (err) {
                 document.getElementById('result').textContent = String(err);
             }
         }
 
-        // Heatmap generation
-        document.getElementById('genHeatmap').onclick = async () => {
-            const blob = window._lastImageBlob;
-            if (!blob) { alert('No image available. Upload or capture first.'); return; }
-            const useCv = document.getElementById('heatmapColor').checked;
-            const cmap = document.getElementById('heatmapColormap').value || 'jet';
-            // Standardized: no mode selection. Always request the server's Grad-CAM heatmap.
-            const patchParams = '';
+        async function saveToLocalHistory(blob) {
+            const KEY = 'uploadHistory_v1';
+            const MAX_ITEMS = 30;
+            const thumb = await blobToThumbnailDataURL(blob, 240, 0.78);
+            const entry = { ts: Date.now(), thumb };
+            let arr = [];
+            try { arr = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { arr = []; }
+            arr.unshift(entry);
+            if (arr.length > MAX_ITEMS) arr = arr.slice(0, MAX_ITEMS);
+            localStorage.setItem(KEY, JSON.stringify(arr));
+        }
 
-            const form = new FormData();
-            form.append('photo', blob, 'photo.jpg');
+        async function blobToThumbnailDataURL(blob, maxSize, quality) {
+            const bmp = await createImageBitmap(blob);
+            const scale = Math.min(1, maxSize / Math.max(bmp.width, bmp.height));
+            const w = Math.max(1, Math.round(bmp.width * scale));
+            const h = Math.max(1, Math.round(bmp.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bmp, 0, 0, w, h);
+            return canvas.toDataURL('image/jpeg', quality);
+        }
 
-            try {
-                document.getElementById('result').textContent = 'Generating heatmap...';
-                const q = useCv ? `?cv=1&colormap=${encodeURIComponent(cmap)}` : '';
-                const url = `${backend}/model/heatmap${q}`;
-                const res = await fetch(url, {
-                    method: 'POST',
-                    body: form
-                });
-                const data = await res.json();
-                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
-                if (data) {
-                    // Do not show heatmap preview in the frontend per user preference.
-                    // Instead, display returned metadata and server-side paths (if any).
-                    const info = Object.assign({}, data);
-                    // remove large base64 payloads from display
-                    if (info.heatmap_base64) delete info.heatmap_base64;
-                    if (info.overlay_base64) delete info.overlay_base64;
-                    let msg = JSON.stringify(info, null, 2);
-                    if (data.temperature_stats) {
-                        const stats = data.temperature_stats;
-                        msg += '\n\nTemperature stats — min: ' + stats.min.toFixed(3) + ', max: ' + stats.max.toFixed(3) + ', mean: ' + stats.mean.toFixed(3);
-                    }
-                    if (data.overlay_path) {
-                        msg += '\n\nOverlay saved at: ' + data.overlay_path;
-                    } else if (data.heatmap_path) {
-                        msg += '\n\nHeatmap saved at: ' + data.heatmap_path;
-                    }
-                    document.getElementById('result').textContent = msg;
-                }
-            } catch (err) {
-                document.getElementById('result').textContent = String(err);
+        function formatLabelsForDisplay(labels) {
+            if (!Array.isArray(labels) || !labels.length) return '';
+
+            // Only show top 5 matches
+            const top = labels.slice(0, 5);
+
+            function extractItemName(desc) {
+                if (!desc) return 'Unknown';
+                const s = desc.toString();
+                // If description looks like "Match 1: C:\\path\\to\\file.jpg", take the part after ':'
+                const afterColon = s.includes(':') ? s.split(':').slice(1).join(':').trim() : s.trim();
+                // Normalize slashes and split path
+                const parts = afterColon.replace(/\\/g, '/').split('/').filter(Boolean);
+                if (parts.length === 0) return 'Unknown';
+                const last = parts[parts.length - 1]; // filename or folder
+                // Strip extension if present
+                const base = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                return base || 'Unknown';
             }
-        };
+
+            return top.map((m, idx) => {
+                const rawDesc = (m.description ?? m.label ?? '').toString().trim();
+                const item = extractItemName(rawDesc);
+                const pct = ((m.confidence ?? m.score ?? 0) * 100).toFixed(1);
+                // Example: "Match 1 - Item: download, possibility: 94.9%"
+                return `Match ${idx + 1} - Item: ${item}, possibility: ${pct}%`;
+            }).join('\n\n');
+        }
+
+        function showTsneChart(tsne) {
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            // Destroy old chart if exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const input = Array.isArray(tsne?.input) ? tsne.input : null;
+            const neighbors = Array.isArray(tsne?.neighbors) ? tsne.neighbors : [];
+
+            const inputData = input ? [{ x: input[0], y: input[1] }] : [];
+            const neighborData = neighbors
+                .filter(n => Array.isArray(n?.coord) && n.coord.length >= 2)
+                .map(n => {
+                    const pathStr = (n.path ?? '').toString();
+                    const parts = pathStr.replace(/\\/g, '/').split('/').filter(Boolean);
+                    const last = parts.length ? parts[parts.length - 1] : 'Unknown';
+                    const item = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                    const possibility = ((Number(n.score ?? 0)) * 100);
+                    return {
+                        x: n.coord[0],
+                        y: n.coord[1],
+                        item: item || 'Unknown',
+                        possibility
+                    };
+                });
+
+            // Shift neighbors toward the input point based on possibility (higher -> closer)
+            const MAX_SHIFT = 0.7; // max fraction of the vector to move toward input
+            const adjustedNeighborData = neighborData.map(d => {
+                if (!input) return { ...d };
+                const ix = input[0], iy = input[1];
+                const dx = d.x - ix;
+                const dy = d.y - iy;
+                const shiftFrac = Math.max(0, Math.min(1, (d.possibility / 100) * MAX_SHIFT));
+                // move point toward input by shiftFrac of the vector
+                const nx = ix + (1 - shiftFrac) * dx;
+                const ny = iy + (1 - shiftFrac) * dy;
+                return { x: nx, y: ny, item: d.item, possibility: d.possibility };
+            });
+
+            // Assign a distinct color for each unique item
+            const uniqueItems = [...new Set(adjustedNeighborData.map(d => d.item))];
+            function colorForIndex(i) {
+                // HSL-based palette for readable, distinct colors
+                const hue = (i * 47) % 360; // step by 47 to reduce collisions
+                return `hsl(${hue}, 70%, 50%)`;
+            }
+
+            // Build datasets: one for input (red dot) + one per unique item
+            const datasets = [];
+
+            datasets.push({
+                label: 'Input',
+                data: inputData,
+                pointRadius: 6,
+                pointStyle: 'circle',
+                backgroundColor: 'red',
+                borderColor: 'black',
+                borderWidth: 1
+            });
+
+            uniqueItems.forEach((item, idx) => {
+                const color = colorForIndex(idx);
+                const dataPoints = adjustedNeighborData.filter(d => d.item === item).map(d => ({ x: d.x, y: d.y, item: d.item, possibility: d.possibility }));
+                datasets.push({
+                    label: item,
+                    data: dataPoints,
+                    pointRadius: (ctx) => {
+                        const raw = ctx.raw || {};
+                        const p = Number(raw.possibility ?? 0);
+                        return Math.max(4, Math.min(12, 4 + p / 15));
+                    },
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1
+                });
+            });
+
+            chartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const raw = ctx.raw || {};
+                                    if (ctx.dataset.label === 'Input') return 'Input image';
+                                    const item = ctx.dataset.label ?? (raw.item ?? 'Unknown');
+                                    const poss = Number(raw.possibility ?? 0).toFixed(1);
+                                    return `Item: ${item}, possibility: ${poss}%`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: { display: true, text: 't-SNE X', color: '#666', font: { size: 12 } },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y: {
+                            display: true,
+                            title: { display: true, text: 't-SNE Y', color: '#666', font: { size: 12 } },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showBarChart(matches) {
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            // Reuse the same item-name extraction logic as in formatLabelsForDisplay
+            function extractItemName(desc) {
+                if (!desc) return 'Unknown';
+                const s = desc.toString();
+                const afterColon = s.includes(':') ? s.split(':').slice(1).join(':').trim() : s.trim();
+                const parts = afterColon.replace(/\\/g, '/').split('/').filter(Boolean);
+                if (parts.length === 0) return 'Unknown';
+                const last = parts[parts.length - 1];
+                const base = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                return base || 'Unknown';
+            }
+
+            const descriptions = matches.map(m => {
+                const rawDesc = (m.description ?? m.label ?? '').toString().trim();
+                return extractItemName(rawDesc);
+            });
+            const confidences = matches.map(m => (m.confidence ?? m.score ?? 0) * 100);
+
+            // Destroy old chart if exists
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: descriptions,
+                    datasets: [{
+                        label: 'Possibility (%)',
+                        data: confidences,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+    function setTheme(theme) {
+    const root = document.documentElement;
+
+    if (theme === 'light') {
+        root.style.setProperty('--body-bg', '#f5f5f5');
+        root.style.setProperty('--text-color', '#333');
+        root.style.setProperty('--header-color', '#290ce8');
+        root.style.setProperty('--subheader-color', '#290ce8');
+        root.style.setProperty('--container-bg', '#e0e0e0');
+        root.style.setProperty('--sidebar-bg', '#d4d4d4');
+    } 
+    else if (theme === 'dark') {
+        root.style.setProperty('--body-bg', '#1e1e1e');
+        root.style.setProperty('--text-color', '#f5f5f5');
+        root.style.setProperty('--header-color', '#ff9800');
+        root.style.setProperty('--subheader-color', '#ff9800');
+        root.style.setProperty('--container-bg', '#2b2b2b');
+        root.style.setProperty('--sidebar-bg', '#333');
+    } 
+    else if (theme === 'neon') {
+        root.style.setProperty('--body-bg', '#ccc4c4');
+        root.style.setProperty('--text-color', '#333');
+        root.style.setProperty('--container-bg', '#bba9cf');
+        root.style.setProperty('--header-color', '#837cb1');
+        root.style.setProperty('--subheader-color', '#796fba');
+        root.style.setProperty('--sidebar-bg', '#c482dc');
+    }
+    
+    // Save theme to localStorage
+    localStorage.setItem('selectedTheme', theme);
+}
+
+// Load saved theme on page load
+function loadTheme() {
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+    }
+    localStorage.setItem('selectedTheme', theme);
+}
+
+
+ window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        }
+    });
+
     </script>
 </body>
 </html>

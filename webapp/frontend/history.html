@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    <h3>History</h3>
+    
+  <div id="history-gallery" class="gallery"></div>
+  
+<div class="sidebar">
+<button id="toggleSidebar" class="toggle-btn">☰</button>
+  <a href="main.html">🤖Image Analyzer</a>
+  <a href="theme.html">🖼Theme</a>
+  <a href="about.html">⚙ About</a>
+</div>
+
+<script>
+  const toggleBtn = document.getElementById("toggleSidebar");
+const sidebar = document.querySelector(".sidebar");
+
+if (toggleBtn && sidebar) {
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+}
+
+async function loadHistory() {
+    const gallery = document.getElementById("history-gallery");
+    gallery.innerHTML = "<p>Loading images...</p>";
+
+    const KEY = 'uploadHistory_v1';
+    let items = [];
+    try { items = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { items = []; }
+
+    if (!items.length) {
+        gallery.innerHTML = "<p>No images yet. Upload or capture an image to see it here!</p>";
+        return;
+    }
+
+    gallery.innerHTML = "";
+    items.forEach((it) => {
+        const imgContainer = document.createElement("div");
+        imgContainer.style.display = "inline-block";
+        imgContainer.style.margin = "10px";
+        imgContainer.style.textAlign = "center";
+
+        const img = document.createElement("img");
+        img.src = it.thumb;
+        img.style.width = "200px";
+        img.style.height = "200px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "8px";
+        img.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+        img.style.cursor = "pointer";
+
+        img.onclick = () => window.open(it.thumb, '_blank');
+
+        const ts = document.createElement("p");
+        const d = new Date(Number(it.ts || Date.now()));
+        ts.textContent = d.toLocaleString();
+        ts.style.margin = "5px 0 0 0";
+        ts.style.fontSize = "12px";
+        ts.style.color = "#666";
+
+        imgContainer.appendChild(img);
+        imgContainer.appendChild(ts);
+        gallery.appendChild(imgContainer);
+    });
+}
+
+loadHistory();
+function setTheme(theme) {
+    const root = document.documentElement;
+
+    if (theme === 'light') {
+        root.style.setProperty('--body-bg', '#f5f5f5');
+        root.style.setProperty('--text-color', '#333');
+        root.style.setProperty('--header-color', '#290ce8');
+        root.style.setProperty('--subheader-color', '#290ce8');
+        root.style.setProperty('--container-bg', '#e0e0e0');
+        root.style.setProperty('--sidebar-bg', '#d4d4d4');
+    } 
+    else if (theme === 'dark') {
+        root.style.setProperty('--body-bg', '#1e1e1e');
+        root.style.setProperty('--text-color', '#f5f5f5');
+        root.style.setProperty('--header-color', '#ff9800');
+        root.style.setProperty('--subheader-color', '#ff9800');
+        root.style.setProperty('--container-bg', '#2b2b2b');
+        root.style.setProperty('--sidebar-bg', '#333');
+    } 
+    else if (theme === 'neon') {
+        root.style.setProperty('--body-bg', '#ccc4c4');
+        root.style.setProperty('--text-color', '#333');
+        root.style.setProperty('--container-bg', '#bba9cf');
+        root.style.setProperty('--header-color', '#837cb1');
+        root.style.setProperty('--subheader-color', '#796fba');
+        root.style.setProperty('--sidebar-bg', '#c482dc');
+    }
+    
+    // Save theme to localStorage
+    localStorage.setItem('selectedTheme', theme);
+}
+
+// Load saved theme on page load
+function loadTheme() {
+    const savedTheme = localStorage.getItem('selectedTheme');
+    if (savedTheme) {
+        setTheme(savedTheme);
+    }
+    localStorage.setItem('selectedTheme', theme);
+}
+
+
+ window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        }
+    });
+</script>
+
+
+</body>
+</html>
+
+
+
+

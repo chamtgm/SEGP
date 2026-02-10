@@ -7,7 +7,7 @@ from typing import List, Tuple
 
 import numpy as np
 from PIL import Image
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 import torch
 from torchvision import transforms as T
@@ -209,7 +209,7 @@ class ModelService:
         # Return top matches (confidence gating handled by caller)
         return top_matches
 
-    def heatmap_from_bytes(self, data: bytes, use_cv: bool = False, colormap: str = 'jet', alpha: float = 0.5):
+    def heatmap_from_bytes(self, data: bytes, use_cv: bool = False, colormap: str = 'plasma', alpha: float = 0.7):
         """Compute Grad-CAM using the last Conv2d layer if possible.
         Falls back to input-gradient saliency when Grad-CAM cannot be computed.
         Returns dictionary with base64 images and a small temperature map/stats.
@@ -311,7 +311,7 @@ class ModelService:
                 cam = cam - cam.min()
                 if cam.max() > 0:
                     cam = cam / (cam.max())
-                agg_uint8 = (cam * 255).astype(np.uint8)
+                agg = cam
             else:
                 # Fallback: use input gradients
                 if x.grad is None:
@@ -333,7 +333,6 @@ class ModelService:
                 agg = agg - agg.min()
                 if agg.max() > 0:
                     agg = agg / (agg.max())
-                agg_uint8 = (agg * 255).astype(np.uint8)
         finally:
             for h in hook_handles:
                 try:
@@ -341,7 +340,17 @@ class ModelService:
                 except Exception:
                     pass
 
-        # Apply colormap if requested
+        # Normalize activation map to [0,255] (simple, original-style behavior)
+        try:
+            a = np.array(agg, dtype=np.float32)
+            a = a - a.min()
+            if a.max() > 0:
+                a = a / a.max()
+            agg_uint8 = (a * 255).astype(np.uint8)
+        except Exception:
+            agg_uint8 = (np.clip(agg, 0.0, 1.0) * 255).astype(np.uint8)
+
+        # Apply colormap if requested (simple original mapping)
         if use_cv and HAVE_CV2:
             try:
                 arr = agg_uint8
@@ -575,6 +584,15 @@ app = Flask('simclr_service')
 svc = ModelService()
 
 
+@app.after_request
+def add_cors_headers(resp):
+    """Allow frontend on http://127.0.0.1:8080 to call this API."""
+    resp.headers['Access-Control-Allow-Origin'] = 'http://127.0.0.1:8080'
+    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+    resp.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+    return resp
+
+
 def _strip_nulls(obj):
     """Recursively remove keys with value None from dicts."""
     if isinstance(obj, dict):
@@ -610,10 +628,14 @@ def embed():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/nn', methods=['POST'])
+@app.route('/nn', methods=['POST', 'OPTIONS'])
 def nn():
     try:
+        # Handle CORS preflight
+        if request.method == 'OPTIONS':
+            return make_response(('', 200))
         k = int(request.args.get('k', '5'))
+        tsne_plot = str(request.args.get('tsne_plot', '1')).lower() in ('1', 'true', 'yes')
         data = request.get_data()
         if not data:
             return jsonify({'error': 'empty body'}), 400
@@ -713,10 +735,12 @@ def nn():
                 # 1. Start with Anchors (Background)
                 if svc.anchor_embeddings is not None:
                     background = svc.anchor_embeddings
+                    print(f"t-SNE: Using {background.shape[0]} anchor embeddings as background")
                 else:
                     # Fallback: use a subset of gallery if anchors missing (better than nothing)
                     bg_count = min(500, svc.gallery_embeddings.shape[0])
                     background = svc.gallery_embeddings[:bg_count]
+                    print(f"t-SNE: Using {bg_count} gallery embeddings as background (anchors not available)")
 
                 # 2. Stack: [Background] + [Input] + [Neighbors]
                 # Note: We stack neighbors last to easily find them
@@ -727,8 +751,10 @@ def nn():
                 ])
 
                 # 3. Run t-SNE
+                print(f"t-SNE: Computing with {arr.shape[0]} total points ({background.shape[0]} background + 1 input + {len(neigh_embs)} neighbors)")
                 ts = TSNE(n_components=2, perplexity=30, init='pca', random_state=0)
                 coords = ts.fit_transform(arr)
+                print("t-SNE: Computation complete")
 
                 # 4. Unpack Coordinates
                 n_bg = background.shape[0]
@@ -749,53 +775,63 @@ def nn():
                 }
 
                 # 5. Plotting (Update indices)
-                try:
-                    fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
-
-                    # Plot Background (Gray, small, transparent)
-                    bg_x = [c[0] for c in bg_coords]
-                    bg_y = [c[1] for c in bg_coords]
-                    ax.scatter(bg_x, bg_y, c='lightgray', s=20, alpha=0.5, label='Context')
-
-                    # Plot Neighbors (Colored by score)
-                    neigh_x = [c[0] for c in neigh_coords_list]
-                    neigh_y = [c[1] for c in neigh_coords_list]
-                    ax.scatter(neigh_x, neigh_y, c=valid_scores, cmap='viridis', s=60, edgecolor='k', label='Neighbors')
-
-                    # Plot Input (Red Star)
-                    ax.scatter(input_coord[0], input_coord[1], c='red', marker='*', s=150, edgecolor='k', label='Input')
-
-                    ax.set_title('Robustness Analysis (t-SNE)')
-                    ax.legend()
-                    ax.axis('off')
-
-                    buf = io.BytesIO()
-                    plt.tight_layout()
-                    fig.savefig(buf, format='png', bbox_inches='tight')
-                    plt.close(fig)
-                    buf.seek(0)
-                    # save PNG to disk instead of returning base64
-                    out_dir = Path(ROOT) / 'uploads' / 'tsne_plots'
-                    out_dir.mkdir(parents=True, exist_ok=True)
-                    fname = f"tsne_{int(time.time()*1000)}.png"
-                    fpath = out_dir / fname
-                    with open(fpath, 'wb') as f:
-                        f.write(buf.getvalue())
-                    # return filesystem path and attempt to open automatically
-                    resp['tsne_plot_path'] = str(fpath)
+                if tsne_plot:
                     try:
-                        if sys.platform.startswith('win'):
-                            os.startfile(str(fpath))
-                        elif sys.platform == 'darwin':
-                            subprocess.run(['open', str(fpath)], check=False)
-                        else:
-                            subprocess.run(['xdg-open', str(fpath)], check=False)
+                        fig, ax = plt.subplots(figsize=(6, 6), dpi=100)
+
+                        # Plot Background (Gray, small, transparent)
+                        bg_x = [c[0] for c in bg_coords]
+                        bg_y = [c[1] for c in bg_coords]
+                        ax.scatter(bg_x, bg_y, c='lightgray', s=20, alpha=0.5, label='Context')
+
+                        # Plot Neighbors (Colored by score)
+                        neigh_x = [c[0] for c in neigh_coords_list]
+                        neigh_y = [c[1] for c in neigh_coords_list]
+                        ax.scatter(neigh_x, neigh_y, c=valid_scores, cmap='viridis', s=60, edgecolor='k', label='Neighbors')
+
+                        # Plot Input (Red Star)
+                        ax.scatter(input_coord[0], input_coord[1], c='red', marker='*', s=150, edgecolor='k', label='Input')
+
+                        ax.set_title('Robustness Analysis (t-SNE)')
+                        ax.legend()
+                        ax.axis('off')
+
+                        buf = io.BytesIO()
+                        plt.tight_layout()
+                        fig.savefig(buf, format='png', bbox_inches='tight')
+                        plt.close(fig)
+                        buf.seek(0)
+                        # save PNG to disk instead of returning base64
+                        out_dir = Path(ROOT) / 'uploads' / 'tsne_plots'
+                        out_dir.mkdir(parents=True, exist_ok=True)
+                        fname = f"tsne_{int(time.time()*1000)}.png"
+                        fpath = out_dir / fname
+                        # Ensure absolute path for Windows compatibility
+                        fpath = fpath.resolve()
+                        with open(fpath, 'wb') as f:
+                            f.write(buf.getvalue())
+                        # return filesystem path and attempt to open automatically
+                        resp['tsne_plot_path'] = str(fpath)
+                        print(f"Saved t-SNE plot to: {fpath}")
+                        try:
+                            if sys.platform.startswith('win'):
+                                # Use absolute path string for os.startfile
+                                fpath_str = str(fpath)
+                                print(f"Opening t-SNE plot: {fpath_str}")
+                                os.startfile(fpath_str)
+                                print("t-SNE plot opened successfully")
+                            elif sys.platform == 'darwin':
+                                subprocess.run(['open', str(fpath)], check=False)
+                            else:
+                                subprocess.run(['xdg-open', str(fpath)], check=False)
+                        except Exception as e:
+                            # Log error but don't fail the request
+                            print(f"Warning: Failed to open t-SNE plot automatically: {e}")
+                            print(f"  Plot saved at: {fpath}")
+                            pass
                     except Exception:
-                        # ignore failures to open viewer
+                        # plotting failed, skip image
                         pass
-                except Exception:
-                    # plotting failed, skip image
-                    pass
         except Exception:
             # if any step fails, just skip tsne
             pass
@@ -805,17 +841,20 @@ def nn():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/heatmap', methods=['POST'])
+@app.route('/heatmap', methods=['POST', 'OPTIONS'])
 def heatmap():
     try:
+        # Handle CORS preflight
+        if request.method == 'OPTIONS':
+            return make_response(('', 200))
         data = request.get_data()
         if not data:
             return jsonify({'error': 'empty body'}), 400
         # support optional OpenCV colored heatmap via ?cv=1 and ?colormap=jet
         # Standardize: always compute the Grad-CAM style heatmap (no mode switching)
         use_cv = str(request.args.get('cv', '0')).lower() in ('1', 'true', 'yes')
-        colormap = request.args.get('colormap', 'jet')
-        alpha = float(request.args.get('alpha') or 0.5)
+        colormap = request.args.get('colormap', 'plasma')
+        alpha = float(request.args.get('alpha') or 0.7)
         out = svc.heatmap_from_bytes(data, use_cv=use_cv, colormap=colormap, alpha=alpha)
 
         # Save returned images (heatmap and overlay) if present
@@ -874,6 +913,28 @@ def reload_ckpt():
         svc.load_model(path)
         # rebuild gallery embeddings on reload to ensure consistency
         svc.build_gallery(rebuild=True)
+
+        # Attempt to (re)load anchor embeddings if present so t-SNE uses them immediately
+        try:
+            anchor_path = str(ROOT / 'anchors' / 'embeddings.npy')
+            if os.path.exists(anchor_path):
+                try:
+                    print(f"Reload: Loading t-SNE anchors from {anchor_path}...")
+                    svc.anchor_embeddings = np.load(anchor_path)
+                    norms = np.linalg.norm(svc.anchor_embeddings, axis=1, keepdims=True) + 1e-10
+                    svc.anchor_embeddings = svc.anchor_embeddings / norms
+                    if svc.anchor_embeddings.shape[0] > 500:
+                        indices = np.random.choice(svc.anchor_embeddings.shape[0], 500, replace=False)
+                        svc.anchor_embeddings = svc.anchor_embeddings[indices]
+                    print(f"Reload: Loaded {svc.anchor_embeddings.shape[0]} anchors")
+                except Exception:
+                    svc.anchor_embeddings = None
+                    print(f"Reload: Failed to load anchors from {anchor_path}")
+            else:
+                print("Reload: No anchors/embeddings.npy found; continuing without anchors")
+        except Exception:
+            print("Reload: anchor reload step failed, continuing")
+
         return jsonify({'ok': True, 'ckpt': svc.ckpt_path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500

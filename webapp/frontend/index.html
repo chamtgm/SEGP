@@ -1,59 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Analyzer</title>
     <style>
         #preview { max-width: 300px; }
         pre { background: #f0f0f0; padding: 10px; }
+        .heatmap-opts { margin: 10px 0; }
+        .heatmap-opts label { margin-right: 12px; }
     </style>
 </head>
 <body>
     <h1>Image Analyzer</h1>
     <input type="file" id="file" accept="image/*">
+    <div class="heatmap-opts">
+        <label><input type="checkbox" id="heatmapColor" checked> Colored (OpenCV)</label>
+        <label>Colormap:
+            <select id="heatmapColormap">
+                <option value="jet" selected>jet</option>
+                <option value="hot">hot</option>
+                <option value="viridis">viridis</option>
+                <option value="plasma">plasma</option>
+                <option value="magma">magma</option>
+                <option value="inferno">inferno</option>
+                <option value="gray">gray</option>
+            </select>
+        </label>
+        <label>Overlay α: <input type="number" id="heatmapAlpha" min="0" max="1" step="0.1" value="0.7" style="width:48px"></label>
+    </div>
     <div style="display:flex;gap:16px;align-items:flex-start;margin-top:12px;">
         <div>
             <div>Original</div>
-            <img id="preview" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff">
+            <img id="preview" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff" alt="Preview">
         </div>
         <div>
             <div>Heatmap</div>
-            <img id="heatmap" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff">
+            <img id="heatmap" style="max-width:320px;display:block;border:1px solid #ddd;padding:4px;background:#fff" alt="Heatmap">
         </div>
     </div>
     <pre id="result"></pre>
     <script>
-        const backend = 'http://localhost:3000';
+        const backend = 'http://127.0.0.1:3000';
         document.getElementById('file').onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Show preview
             const reader = new FileReader();
             reader.onload = e => document.getElementById('preview').src = e.target.result;
             reader.readAsDataURL(file);
 
-            // Upload to backend and request heatmap
             const form = new FormData();
             form.append('photo', file);
 
-            // Show immediate uploading state
             document.getElementById('result').textContent = 'Processing...';
             document.getElementById('heatmap').src = '';
 
+            const useCv = document.getElementById('heatmapColor').checked;
+            const cmap = document.getElementById('heatmapColormap').value || 'jet';
+            const alpha = document.getElementById('heatmapAlpha').value || '0.7';
+            const qs = new URLSearchParams();
+            if (useCv) qs.set('cv', '1');
+            qs.set('colormap', cmap);
+            qs.set('alpha', alpha);
+
             try {
-                // Call the model heatmap endpoint on the Node backend which forwards to Python
-                const res = await fetch(`${backend}/model/heatmap`, {
+                const res = await fetch(`${backend}/model/heatmap?${qs.toString()}`, {
                     method: 'POST',
                     body: form
                 });
                 const json = await res.json();
                 document.getElementById('result').textContent = JSON.stringify(json, null, 2);
 
-                if (json.heatmap_base64) {
-                    // Display heatmap as data URL
+                if (json.overlay_base64) {
+                    document.getElementById('heatmap').src = 'data:image/png;base64,' + json.overlay_base64;
+                } else if (json.heatmap_base64) {
                     document.getElementById('heatmap').src = 'data:image/png;base64,' + json.heatmap_base64;
                 } else if (json.heatmap_path) {
-                    // If backend returns a server path, display via Node static route if configured
                     document.getElementById('heatmap').alt = json.heatmap_path;
                 } else if (json.error) {
                     document.getElementById('result').textContent = 'Error: ' + json.error;
