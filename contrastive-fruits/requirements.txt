@@ -4,10 +4,10 @@ numpy
 Pillow
 tqdm
 opencv-python
-albumentations
-timm
 matplotlib
 scikit-learn
 flask
 requests
 ultralytics
+PyYAML
+rembg
