@@ -7,10 +7,11 @@ class ConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch, stride=1):
         super().__init__()
         self.conv = nn.Conv2d(in_ch, out_ch, 3, stride=stride, padding=1)
-        self.bn = nn.BatchNorm2d(out_ch)
+        # InstanceNorm is crucial for Style Transfer as it preserves unique image details
+        self.norm = nn.InstanceNorm2d(out_ch, affine=True) 
 
     def forward(self, x):
-        return F.relu(self.bn(self.conv(x)))
+        return F.relu(self.norm(self.conv(x)))
 
 
 class StyleEncoder(nn.Module):
@@ -38,10 +39,16 @@ class StyleEncoder(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, latent_dim=64, content_ch=3, base=32, latent_spatial=7):
         super().__init__()
-        # simple decoder: map latent to spatial feature and concatenate with content
         self.latent_spatial = latent_spatial
         self.latent_fc = nn.Linear(latent_dim, base * 4 * self.latent_spatial * self.latent_spatial)
-        self.conv1 = ConvBlock(base * 4 + content_ch, base * 4)
+        
+        # NEW: A specific convolution to expand the Content features
+        # Expands 3 channels -> 32 channels (base)
+        self.content_encoder = ConvBlock(content_ch, base) 
+
+        # Adjusted input channels: (base*4 from style) + (base from content)
+        self.conv1 = ConvBlock(base * 4 + base, base * 4)
+        
         self.up1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
         self.conv2 = ConvBlock(base * 4, base * 2)
         self.up2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False)
@@ -51,18 +58,27 @@ class Decoder(nn.Module):
     def forward(self, content, z):
         # content: Bx3xHxW, z: Bxlatent_dim
         B, C, H, W = content.shape
+        
+        # 1. Process Style (Latent)
         x = self.latent_fc(z).view(B, -1, self.latent_spatial, self.latent_spatial)
-        # resize x to content spatial resolution roughly
         x = F.interpolate(x, size=(H // 4, W // 4), mode='bilinear', align_corners=False)
-        # downsample content to match x spatial dims
+        
+        # 2. Process Content (New Step)
+        # Downsample content to match feature map size
         content_small = F.interpolate(content, size=x.shape[2:], mode='bilinear', align_corners=False)
-        x = torch.cat([x, content_small], dim=1)
+        # Pass through the new encoder to get richer features (3 -> 32 channels)
+        content_feat = self.content_encoder(content_small)
+        
+        # 3. Concatenate (Now Balanced: 128ch + 32ch)
+        x = torch.cat([x, content_feat], dim=1)
+        
         x = self.conv1(x)
         x = self.up1(x)
         x = self.conv2(x)
         x = self.up2(x)
         x = self.conv3(x)
         x = self.conv_final(x)
+        
         out = torch.sigmoid(x)
         out = F.interpolate(out, size=(H, W), mode='bilinear', align_corners=False)
         return out

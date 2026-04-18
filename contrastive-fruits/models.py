@@ -10,18 +10,15 @@ import importlib.util
 import os
 
 _here = os.path.dirname(__file__)
-# Search common locations for the ResNet implementation to support different repo layouts
-_candidates = [
+_candidate_paths = [
     os.path.join(_here, 'ResNet.py'),
-    os.path.join(_here, 'contrastive-fruits', 'ResNet.py')
+    os.path.join(_here, 'contrastive-fruits', 'ResNet.py'),
 ]
-_resnet_path = None
-for p in _candidates:
-    if os.path.exists(p):
-        _resnet_path = p
+for _resnet_path in _candidate_paths:
+    if os.path.exists(_resnet_path):
         break
-if _resnet_path is None:
-    raise ImportError(f'ResNet implementation not found; tried: {", ".join(_candidates)}')
+else:
+    raise ImportError(f"ResNet implementation not found at any of: {_candidate_paths}")
 
 spec = importlib.util.spec_from_file_location('cf_resnet', _resnet_path)
 _cf = importlib.util.module_from_spec(spec)

@@ -6,6 +6,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader, random_split
 from PIL import Image
 import torchvision.transforms as T
+from sklearn.metrics import precision_score, recall_score, f1_score
 from models import get_backbone
 from utils import find_images
 
@@ -95,6 +96,25 @@ class LabeledImageFolder(Dataset):
         return img, label
 
 
+class SubsetWithTransform(Dataset):
+    """Wrap a Subset (from random_split) and apply a transform per-split."""
+    def __init__(self, subset, transform=None):
+        self.subset = subset
+        self.transform = transform
+        # expose commonly used attributes to be compatible with existing code
+        self.indices = getattr(subset, 'indices', None)
+        self.dataset = getattr(subset, 'dataset', None)
+
+    def __len__(self):
+        return len(self.subset)
+
+    def __getitem__(self, idx):
+        img, label = self.subset[idx]
+        if self.transform:
+            img = self.transform(img)
+        return img, label
+
+
 def parse_args():
     p = argparse.ArgumentParser()
     p.add_argument('--fruit-root', type=str, required=True)
@@ -104,9 +124,11 @@ def parse_args():
     p.add_argument('--epochs', type=int, default=5)
     p.add_argument('--batch-size', type=int, default=64)
     p.add_argument('--lr', type=float, default=5e-3)
+    p.add_argument('--val-split', type=float, default=0.2, help='Fraction of data to use for validation when no val folder provided')
     p.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
     p.add_argument('--balance', type=str, default='weighted', choices=['none', 'weighted'], help='Use class-balanced sampling for training (weighted sampler)')
     p.add_argument('--seed', type=int, default=42, help='Random seed for reproducibility (used for sampler)')
+    p.add_argument('--num-workers', type=int, default=4, help='Number of subprocesses to use for data loading')
     return p.parse_args()
 
 
@@ -118,10 +140,27 @@ def main():
     if ckpt_path is None:
         raise RuntimeError(f"No checkpoint found in {args.ckpt_dir}")
     print("Using checkpoint:", ckpt_path)
+    # determine directory to save linear-probe best checkpoint
+    if os.path.isdir(args.ckpt_dir):
+        save_dir = args.ckpt_dir
+    else:
+        # if args.ckpt_dir was a file path or a file-containing folder, use the ckpt file's directory
+        save_dir = os.path.dirname(ckpt_path) or os.getcwd()
+    os.makedirs(save_dir, exist_ok=True)
 
-    # simple transforms for linear probe
-    transform = T.Compose([
-        T.Resize((224, 224)),
+    # Training Transform (Matches SimCLR Protocol)
+    train_transform = T.Compose([
+        T.RandomResizedCrop(224),       # Randomly crop and resize
+        T.RandomHorizontalFlip(),       # Randomly flip left/right
+        T.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])
+    ])
+
+    # Validation Transform (Standard Evaluation)
+    val_transform = T.Compose([
+        T.Resize(256),                  # Resize slightly larger
+        T.CenterCrop(224),              # Crop the center
         T.ToTensor(),
         T.Normalize(mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225])
     ])
@@ -135,9 +174,9 @@ def main():
     if args.train_root or args.val_root:
         if not args.train_root or not args.val_root:
             raise RuntimeError('Both --train-root and --val-root must be provided when using explicit split folders')
-        train_ds = LabeledImageFolder(args.train_root, transform=transform)
+        train_ds = LabeledImageFolder(args.train_root, transform=train_transform)
         # align val labels to train mapping
-        val_ds = LabeledImageFolder(args.val_root, transform=transform, class_to_idx=train_ds.class_to_idx)
+        val_ds = LabeledImageFolder(args.val_root, transform=val_transform, class_to_idx=train_ds.class_to_idx)
         num_classes = len(train_ds.class_to_idx)
         print(f"Using explicit folders. Train images: {len(train_ds)}, Val images: {len(val_ds)}, {num_classes} classes")
     else:
@@ -145,18 +184,21 @@ def main():
         train_dir = os.path.join(args.fruit_root, 'train')
         val_dir = os.path.join(args.fruit_root, 'val')
         if os.path.isdir(train_dir) and os.path.isdir(val_dir):
-            train_ds = LabeledImageFolder(train_dir, transform=transform)
-            val_ds = LabeledImageFolder(val_dir, transform=transform, class_to_idx=train_ds.class_to_idx)
+            train_ds = LabeledImageFolder(train_dir, transform=train_transform)
+            val_ds = LabeledImageFolder(val_dir, transform=val_transform, class_to_idx=train_ds.class_to_idx)
             num_classes = len(train_ds.class_to_idx)
             print(f"Auto-detected train/val. Train images: {len(train_ds)}, Val images: {len(val_ds)}, {num_classes} classes")
         else:
             # single folder: build dataset and random-split according to --val-split
-            dataset = LabeledImageFolder(args.fruit_root, transform=transform)
+            # create base dataset without transform so we can apply different transforms
+            dataset = LabeledImageFolder(args.fruit_root, transform=None)
             num_classes = len(dataset.class_to_idx)
             print(f"Found {len(dataset)} images, {num_classes} classes")
             val_size = int(len(dataset) * args.val_split)
             train_size = len(dataset) - val_size
-            train_ds, val_ds = random_split(dataset, [train_size, val_size])
+            train_subset, val_subset = random_split(dataset, [train_size, val_size])
+            train_ds = SubsetWithTransform(train_subset, transform=train_transform)
+            val_ds = SubsetWithTransform(val_subset, transform=val_transform)
 
     # Optionally use class-balanced sampling to oversample minority classes
     train_loader = None
@@ -194,10 +236,10 @@ def main():
         gen = torch.Generator()
         gen.manual_seed(int(args.seed))
         sampler = WeightedRandomSampler(weights_for_train, num_samples=len(weights_for_train), replacement=True, generator=gen)
-        train_loader = DataLoader(train_ds, batch_size=args.batch_size, sampler=sampler, num_workers=4, pin_memory=True)
+        train_loader = DataLoader(train_ds, batch_size=args.batch_size, sampler=sampler, num_workers=args.num_workers, pin_memory=True)
         print('Using weighted sampler for training. Class counts:', counts.tolist())
     else:
-        train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
         # print class counts for visibility when not using weighted sampler
         counts = [0] * num_classes
         if dataset is not None:
@@ -207,14 +249,30 @@ def main():
             for _, lbl in getattr(train_ds, 'samples', []):
                 counts[int(lbl)] += 1
         print('Class counts:', counts)
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
 
     # load backbone and checkpoint
     model = get_backbone(pretrained=False)
     # load checkpoint
     ckpt = torch.load(ckpt_path, map_location='cpu')
     # ckpt['model_state'] contains encoder+projector
-    model.load_state_dict(ckpt['model_state'], strict=False)
+    raw_state = ckpt.get('model_state', ckpt)
+    
+    # --- The Translator: Convert Triplet '0.' keys to 'encoder.' keys ---
+    fixed_state = {}
+    for k, v in raw_state.items():
+        if k.startswith("0."):
+            new_key = k.replace("0.", "encoder.", 1)
+            fixed_state[new_key] = v
+        else:
+            fixed_state[k] = v
+
+    # Load and verify!
+    load_result = model.load_state_dict(fixed_state, strict=False)
+    print("\n--- BACKBONE LOAD RESULT ---")
+    print(f"Missing keys: {len(load_result.missing_keys)}")
+    print(f"Unexpected keys: {len(load_result.unexpected_keys)}")
+    print("----------------------------\n")
 
     model = model.to(device)
     model.eval()
@@ -231,7 +289,7 @@ def main():
     # classifier
     classifier = nn.Linear(feat_dim, num_classes).to(device)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(classifier.parameters(), lr=args.lr, momentum=0.9)
+    optimizer = optim.SGD(classifier.parameters(), lr=args.lr, momentum=0.9, weight_decay=1e-2)
 
     best_val_acc = 0.0
     for epoch in range(1, args.epochs + 1):
@@ -239,6 +297,8 @@ def main():
         running_loss = 0.0
         correct = 0
         total = 0
+        all_train_preds = []
+        all_train_labels = []
         train_iter = tqdm(train_loader, desc=f"Epoch {epoch} Train", unit="batch") if tqdm is not None else train_loader
         for imgs, labels in train_iter:
             imgs = imgs.to(device)
@@ -255,14 +315,22 @@ def main():
             preds = logits.argmax(dim=1)
             correct += (preds == labels).sum().item()
             total += imgs.size(0)
+            
+            all_train_preds.extend(preds.cpu().numpy())
+            all_train_labels.extend(labels.cpu().numpy())
 
         train_loss = running_loss / total
         train_acc = correct / total if total > 0 else 0.0
+        train_prec = precision_score(all_train_labels, all_train_preds, average='weighted', zero_division=0)
+        train_rec = recall_score(all_train_labels, all_train_preds, average='weighted', zero_division=0)
+        train_f1 = f1_score(all_train_labels, all_train_preds, average='weighted', zero_division=0)
 
         # val
         classifier.eval()
         v_correct = 0
         v_total = 0
+        all_val_preds = []
+        all_val_labels = []
         val_iter = tqdm(val_loader, desc=f"Epoch {epoch} Val", unit="batch") if tqdm is not None else val_loader
         with torch.no_grad():
             for imgs, labels in val_iter:
@@ -273,12 +341,19 @@ def main():
                 preds = logits.argmax(dim=1)
                 v_correct += (preds == labels).sum().item()
                 v_total += imgs.size(0)
+                
+                all_val_preds.extend(preds.cpu().numpy())
+                all_val_labels.extend(labels.cpu().numpy())
+                
         val_acc = v_correct / v_total if v_total > 0 else 0.0
+        val_prec = precision_score(all_val_labels, all_val_preds, average='weighted', zero_division=0)
+        val_rec = recall_score(all_val_labels, all_val_preds, average='weighted', zero_division=0)
+        val_f1 = f1_score(all_val_labels, all_val_preds, average='weighted', zero_division=0)
 
-        print(f"Epoch {epoch}: train_loss={train_loss:.4f} train_acc={train_acc:.4f} val_acc={val_acc:.4f}")
+        print(f"Epoch {epoch}: train_loss={train_loss:.4f} train_acc={train_acc:.4f} train_f1={train_f1:.4f} | val_acc={val_acc:.4f} val_f1={val_f1:.4f} val_prec={val_prec:.4f} val_rec={val_rec:.4f}")
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save({'classifier_state': classifier.state_dict(), 'epoch': epoch, 'val_acc': val_acc}, os.path.join(args.ckpt_dir, 'linear_probe_best.pt'))
+            torch.save({'classifier_state': classifier.state_dict(), 'epoch': epoch, 'val_acc': val_acc}, os.path.join(save_dir, 'linear_probe_best.pt'))
 
     print('Done. Best val acc =', best_val_acc)
 

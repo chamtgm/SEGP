@@ -10,3 +10,4 @@ matplotlib
 scikit-learn
 flask
 requests
+ultralytics

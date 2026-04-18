@@ -23,6 +23,9 @@ def parse_args():
     p.add_argument('--style-method', type=str, default='simple', choices=['simple', 'reinhard', 'hvae'], help='Style transfer method to create counterfactuals')
     p.add_argument('--hvae-ckpt', type=str, default=None, help='Path to pretrained HVAE checkpoint (required when --style-method=hvae)')
     p.add_argument('--device', type=str, default='cuda' if torch.cuda.is_available() else 'cpu')
+    p.add_argument('--num-workers', type=int, default=4, help='Number of DataLoader workers')
+    p.add_argument('--resume', action='store_true', help='Resume from latest checkpoint in --save-dir')
+    p.add_argument('--resume-ckpt', type=str, default=None, help='Path to specific checkpoint to resume from (overrides --resume)')
     return p.parse_args()
 
 
@@ -31,7 +34,14 @@ def main():
     os.makedirs(args.save_dir, exist_ok=True)
 
     dataset = FruitStyleDataset(args.fruit_root, args.style_root, image_size=224, train=True, style_method=args.style_method, hvae_ckpt=args.hvae_ckpt, device=args.device)
-    loader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+    loader = DataLoader(
+        dataset, 
+        batch_size=args.batch_size, 
+        shuffle=True, 
+        num_workers=0 if os.name == 'nt' else args.num_workers, # Fix Windows multiprocessing issues
+        pin_memory=True,
+        persistent_workers=False
+    )
 
     device = torch.device(args.device)
     model = get_backbone(pretrained=False, projection_size=args.projection_size, projection_hidden=args.projection_hidden)
@@ -39,12 +49,54 @@ def main():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 
-    for epoch in range(1, args.epochs + 1):
+    start_epoch = 1
+    if args.resume_ckpt:
+        ckpt_path = args.resume_ckpt
+        if not os.path.exists(ckpt_path):
+            alt = os.path.join(args.save_dir, ckpt_path)
+            if os.path.exists(alt):
+                ckpt_path = alt
+        if not os.path.exists(ckpt_path):
+            print('Checkpoint not found at', args.resume_ckpt)
+            raise SystemExit(1)
+        print(f'Loading checkpoint {ckpt_path}')
+        ckpt = torch.load(ckpt_path, map_location=device)
+        model.load_state_dict(ckpt['model_state'])
+        if 'optimizer_state' in ckpt:
+            try:
+                optimizer.load_state_dict(ckpt['optimizer_state'])
+            except Exception:
+                print('Warning: optimizer state could not be loaded (incompatible). Starting with fresh optimizer state.')
+        start_epoch = ckpt.get('epoch', 0) + 1
+    elif args.resume:
+        # discover latest checkpoint in save dir
+        import glob, re
+        ckpts = glob.glob(os.path.join(args.save_dir, 'ckpt_epoch_*.pt'))
+        if ckpts:
+            # extract epoch numbers
+            def epoch_from_name(p):
+                m = re.search(r'ckpt_epoch_(\d+)\.pt$', p)
+                return int(m.group(1)) if m else -1
+            ckpts_sorted = sorted(ckpts, key=epoch_from_name)
+            latest = ckpts_sorted[-1]
+            print(f'Loading checkpoint {latest}')
+            ckpt = torch.load(latest, map_location=device)
+            model.load_state_dict(ckpt['model_state'])
+            if 'optimizer_state' in ckpt:
+                try:
+                    optimizer.load_state_dict(ckpt['optimizer_state'])
+                except Exception:
+                    print('Warning: optimizer state could not be loaded (incompatible). Starting with fresh optimizer state.')
+            start_epoch = ckpt.get('epoch', 0) + 1
+        else:
+            print('No checkpoint found in', args.save_dir, '; starting from scratch')
+
+    for epoch in range(start_epoch, args.epochs + 1):
         model.train()
         pbar = tqdm(loader, desc=f"Epoch {epoch}/{args.epochs}")
         running_loss = 0.0
         for batch in pbar:
-            v1, v2, vcf, labels = batch
+            v1, v2, vcf = batch
             v1 = v1.to(device)
             v2 = v2.to(device)
             vcf = vcf.to(device)
