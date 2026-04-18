@@ -1,0 +1,193 @@
+# QUICK START GUIDE
+
+## 🚀 Get Running in 30 Seconds
+
+### Windows 11 (PowerShell)
+```powershell
+cd c:\Users\WINDOWS 11\Desktop\webapp
+.\start_all.bat
+```
+
+Then open browser to: **http://127.0.0.1:8080/main.html**
+
+---
+
+## 📸 How to Use
+
+### Upload Image
+1. Click **Image🖼️** button
+2. Select photo from device
+3. Wait for analysis
+4. View results and chart
+
+### Use Camera
+1. Click **Capture📸** button
+2. Allow camera access
+3. Click **📸 Capture** to take photo
+4. Click **↺ Retake** if needed
+5. View results
+
+### View Results
+- **JSON Format** - Full response data
+- **Bar Chart** - Confidence scores (0-100%)
+- **Matches** - Top 5 similar images from gallery
+
+---
+
+## ⚙️ API Endpoints
+
+### Health Check
+```
+GET http://127.0.0.1:8001/health
+```
+
+### Upload Image
+```
+POST http://127.0.0.1:8001/upload-form
+Body: multipart/form-data with 'photo' field
+Response: JSON with matches and confidence scores
+```
+
+### Embed Image
+```
+POST http://127.0.0.1:8001/embed
+Body: multipart/form-data with 'photo' field
+Response: JSON with 512-dim embedding vector
+```
+
+### Get Neighbors
+```
+POST http://127.0.0.1:8001/nn?k=5
+Body: multipart/form-data with 'photo' field
+Response: Top-k similar images with distances
+```
+
+---
+
+## 📁 Key Files
+
+| File | Purpose |
+|------|---------|
+| `start_all.bat` | One-click startup (Windows) |
+| `scripts/scripts/python_model_service.py` | Flask backend |
+| `frontend/main.html` | Web interface |
+| `frontend/main.css` | Styling |
+| `ckpt_epoch_1000/ckpt_epoch_1000.pt` | ML model (1GB+) |
+| `gallery/` | Image gallery for search |
+| `README.md` | Full documentation |
+
+---
+
+## 🔧 Troubleshooting
+
+### Backend Won't Start
+```powershell
+# Kill any existing Flask process
+Get-Process python | Stop-Process -Force
+
+# Try again
+.\start_all.bat
+```
+
+### Can't Access Frontend
+- Check URL: `http://127.0.0.1:8080/main.html` (not `localhost`)
+- Check both services are running
+- Clear browser cache (Ctrl+Shift+Del)
+
+### Upload Fails with 404
+- Backend crashed - check logs
+- Try restarting with `.\start_all.bat`
+- Check gallery folder exists
+
+### Slow Image Processing
+- First run is slower (model initialization)
+- Check CPU usage (should spike during processing)
+- On first upload, wait up to 10 seconds
+
+---
+
+## 📊 Adding Gallery Images
+
+```powershell
+# Copy images to gallery folder
+Copy-Item "C:\path\to\images\*.jpg" gallery/
+
+# Restart Flask to rebuild gallery
+.\start_all.bat
+```
+
+Supported formats: `.jpg`, `.jpeg`, `.png`, `.bmp`
+
+---
+
+## 🎨 Changing Theme
+
+Click **🖼Theme** in sidebar to switch between:
+- **Light** - Bright, clean interface
+- **Dark** - Dark background, easy on eyes
+- **Neon** - Purple/pink theme
+
+Theme is saved in browser (persists across sessions)
+
+---
+
+## 📋 System Requirements
+
+- Windows 11
+- Python 3.12+ (already installed)
+- ~2GB free disk space (for model)
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+- Camera (optional, for capture feature)
+
+---
+
+## 🆘 Emergency Stop
+
+### Stop Backend
+- Close Flask terminal window
+- Or run: `Get-Process python | Stop-Process -Force`
+
+### Stop Frontend  
+- Close http-server terminal window
+- Or: `Get-Process node | Stop-Process -Force`
+
+### Hard Reset
+```powershell
+# Kill all Python and Node processes
+Get-Process python, node -ErrorAction SilentlyContinue | Stop-Process -Force
+
+# Start fresh
+.\start_all.bat
+```
+
+---
+
+## ✅ Everything Working?
+
+Run verification:
+```powershell
+.venv\Scripts\Activate.ps1
+python -c "import torch; print('PyTorch:', torch.__version__)"
+python -c "from pathlib import Path; print('Checkpoint:', Path('ckpt_epoch_1000/ckpt_epoch_1000.pt').exists())"
+```
+
+Both should show: **OK**
+
+---
+
+## 📞 Quick Links
+
+- **Frontend**: http://127.0.0.1:8080/main.html
+- **Backend Health**: http://127.0.0.1:8001/health
+- **Full Docs**: Open `README.md`
+- **Status**: Open `STATUS.md`
+
+---
+
+**Tips:**
+- Keep both terminal windows visible to see logs
+- Images are processed in real-time (wait for results)
+- Gallery should have at least 5 images for good results
+- Bookmark the frontend URL for quick access
+
+Happy analyzing! 🎉
