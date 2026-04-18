@@ -20,7 +20,7 @@ Then use the map below 👇
 
 | If your goal is... | Go to folder | Open this guide next |
 |---|---|---|
-| 🖥️ Web interface and frontend experience | [webapp](webapp) | [webapp/README.md](webapp/README.md) |
+| 🖥️ Web interface and frontend experience | [webapp1](webapp1) | [webapp1/README.md](webapp1/README.md) |
 | 🎯 Detection labels, YOLO dataset flow, detector outputs | [Object Detection](Object%20Detection) | [Object Detection/README.md](Object%20Detection/README.md) |
 | 🍎 Self-supervised learning and classifier quality | [contrastive-fruits](contrastive-fruits) | [contrastive-fruits/README.md](contrastive-fruits/README.md) |
 | 🔌 Inference service and API behavior | [scripts](scripts) | [scripts/README.md](scripts/README.md) |
@@ -28,7 +28,7 @@ Then use the map below 👇
 ## 📦 Folder Spotlights (Expandable)
 
 <details>
-<summary><strong>🖥️ webapp</strong> - User-facing web experience</summary>
+<summary><strong>🖥️ webapp1</strong> - User-facing web experience</summary>
 
 What it contains:
 - 🎨 Browser UI pages and styling
@@ -40,7 +40,7 @@ What it is responsible for:
 - 🌉 Connecting UI actions to backend service endpoints
 
 Where to continue:
-- 📘 [webapp/README.md](webapp/README.md)
+- 📘 [webapp1/README.md](webapp1/README.md)
 
 </details>
 
@@ -99,7 +99,7 @@ Where to continue:
 Use this README for navigation.
 
 For any implementation, configuration, or execution detail, always follow the README inside the specific folder:
-- 🖥️ [webapp/README.md](webapp/README.md)
+- 🖥️ [webapp1/README.md](webapp1/README.md)
 - 🎯 [Object Detection/README.md](Object%20Detection/README.md)
 - 🍎 [contrastive-fruits/README.md](contrastive-fruits/README.md)
 - 🔌 [scripts/README.md](scripts/README.md)
