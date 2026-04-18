@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About Analyzer Pro | Digital Curator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary": "#ffffff",
+              "on-primary-fixed-variant": "#303c9a",
+              "primary-fixed": "#dfe0ff",
+              "surface-container-lowest": "#ffffff",
+              "surface-bright": "#f7f9fb",
+              "secondary": "#4858ab",
+              "primary": "#2b3896",
+              "surface-tint": "#4955b3",
+              "on-tertiary-container": "#ffc7a2",
+              "on-primary-fixed": "#000c62",
+              "on-surface": "#191c1e",
+              "inverse-on-surface": "#eff1f3",
+              "primary-container": "#4551af",
+              "on-error-container": "#93000a",
+              "surface-container": "#eceef0",
+              "tertiary-fixed-dim": "#ffb784",
+              "surface-container-high": "#e6e8ea",
+              "on-background": "#191c1e",
+              "on-secondary-fixed": "#00105b",
+              "background": "#f7f9fb",
+              "error": "#ba1a1a",
+              "on-tertiary-fixed-variant": "#713700",
+              "surface-dim": "#d8dadc",
+              "tertiary": "#6c3400",
+              "on-tertiary-fixed": "#301400",
+              "on-secondary-container": "#27378a",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "tertiary-fixed": "#ffdcc6",
+              "outline": "#757684",
+              "tertiary-container": "#8f4700",
+              "primary-fixed-dim": "#bcc2ff",
+              "surface": "#f7f9fb",
+              "on-secondary": "#ffffff",
+              "on-secondary-fixed-variant": "#2f3f92",
+              "surface-container-highest": "#e0e3e5",
+              "secondary-container": "#96a5ff",
+              "on-tertiary": "#ffffff",
+              "surface-variant": "#e0e3e5",
+              "outline-variant": "#c5c5d4",
+              "secondary-fixed": "#dee0ff",
+              "on-primary-container": "#cbcfff",
+              "surface-container-low": "#f2f4f6",
+              "on-surface-variant": "#454652",
+              "secondary-fixed-dim": "#bac3ff",
+              "inverse-primary": "#bcc2ff",
+              "inverse-surface": "#2d3133"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+        }
+        h1, h2, h3 {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-200 antialiased transition-colors duration-300">
+<!-- Side Navigation Shell (Desktop) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-[#f2f4f6] dark:bg-slate-900 flex-col p-4 gap-2 z-40">
+<div class="mb-8 px-2 py-4">
+<h1 class="text-lg font-bold text-[#2b3896] dark:text-indigo-400">Analyzer Pro</h1>
+<p class="text-[10px] uppercase tracking-widest text-[#454652] opacity-60">Creative Intelligence</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="main.html">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+<span>Image Analyzer</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="theme.html">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span>Themes</span>
+</a>
+<!-- ACTIVE TAB: About -->
+<a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 text-[#2b3896] dark:text-indigo-300 rounded-xl shadow-sm hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="about.html">
+<span class="material-symbols-outlined" data-icon="info" style="font-variation-settings: 'FILL' 1;">info</span>
+<span>About</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/10 pt-4">
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 min-h-screen">
+<!-- Top Nav Bar -->
+<header class="flex justify-between items-center w-full px-8 py-4 bg-[#f7f9fb] dark:bg-slate-950 sticky top-0 z-30">
+<div class="flex items-center gap-8">
+<span class="text-xl font-black text-[#2b3896] dark:text-indigo-400 font-['Manrope'] tracking-tight">Digital Curator</span>
+</div>
+</header>
+<!-- Content Area -->
+<div class="max-w-6xl mx-auto px-8 py-12">
+<!-- Hero Section -->
+<section class="mb-20">
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="flex-1 space-y-6">
+<span class="text-primary dark:text-indigo-400 font-bold tracking-widest text-xs uppercase">Generative AI Engine</span>
+<h2 class="text-5xl font-extrabold text-on-surface dark:text-slate-100 leading-tight">Contrastive-Fruits: Real-World AI Classification</h2>
+<p class="text-on-surface-variant dark:text-slate-400 text-lg leading-relaxed max-w-xl">
+                            This AI-powered classification platform bridges the gap between pristine academic datasets and messy, real-world smartphone photography. By leveraging deep metric learning, the system reliably identifies fruits across diverse lighting, camera lenses, and environments without falling victim to the "Out-of-Distribution" errors of traditional models.
+                        </p>
+<div class="pt-4">
+<a href="main.html" class="inline-block bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                                Try Analyzer Pro
+                            </a>
+</div>
+</div>
+<div class="flex-1 w-full relative">
+</div>
+</div>
+</section>
+<!-- Feature Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<!-- Large Feature: Class Prediction -->
+<div class="md:col-span-8 bg-surface-container-low dark:bg-slate-900 border border-transparent dark:border-slate-800 rounded-[2rem] p-10 flex flex-col justify-between overflow-hidden relative group">
+<div class="z-10 max-w-md">
+<div class="w-12 h-12 rounded-2xl bg-primary/10 dark:bg-indigo-500/20 flex items-center justify-center mb-6 text-primary dark:text-indigo-400">
+<span class="material-symbols-outlined text-3xl" data-icon="analytics">analytics</span>
+</div>
+<h3 class="text-3xl font-bold mb-4 dark:text-slate-100">Class Prediction</h3>
+<p class="text-on-surface-variant dark:text-slate-400 leading-relaxed">
+                            Our neural network identifies thousands of objects, scenes, and concepts within your imagery. Leveraging state-of-the-art architectures, we provide hierarchical classification with confidence scoring.
+                        </p>
+</div>
+<div class="mt-12 flex flex-wrap gap-3 z-10">
+<span class="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg border border-outline-variant/20 dark:border-slate-700 text-xs font-bold text-on-surface-variant dark:text-slate-300">Architecture: ResNet18</span>
+<span class="px-4 py-2 bg-white dark:bg-slate-800 rounded-lg border border-outline-variant/20 dark:border-slate-700 text-xs font-bold text-on-surface-variant dark:text-slate-300">Labels: 10</span>
+</div>
+<!-- Decorative Element -->
+<div class="absolute -right-20 -bottom-20 w-80 h-80 bg-primary/5 dark:bg-indigo-500/10 rounded-full blur-3xl group-hover:scale-110 transition-transform duration-700"></div>
+</div>
+<!-- Small Feature: Upload -->
+<div class="md:col-span-4 bg-surface-container-highest dark:bg-slate-800 rounded-[2rem] p-8 flex flex-col">
+<div class="w-12 h-12 rounded-2xl bg-secondary/10 dark:bg-blue-500/20 flex items-center justify-center mb-6 text-secondary dark:text-blue-400">
+<span class="material-symbols-outlined text-3xl" data-icon="cloud_upload">cloud_upload</span>
+</div>
+<h3 class="text-xl font-bold mb-3 dark:text-slate-100">Seamless Capture</h3>
+<p class="text-on-surface-variant dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Drag-and-drop raw files or capture directly via integrated webcam streams for real-time creative feedback.
+                    </p>
+<div class="mt-auto aspect-video rounded-xl bg-surface-container-low dark:bg-slate-900 border-2 border-dashed border-outline-variant/30 dark:border-slate-700 flex items-center justify-center text-outline dark:text-slate-500">
+<span class="material-symbols-outlined text-4xl" data-icon="add_photo_alternate">add_photo_alternate</span>
+</div>
+</div>
+<!-- Small Feature: Heatmaps -->
+<div class="md:col-span-4 bg-surface-container-high dark:bg-slate-800 rounded-[2rem] p-8 flex flex-col">
+<div class="w-12 h-12 rounded-2xl bg-tertiary/10 dark:bg-orange-500/20 flex items-center justify-center mb-6 text-tertiary dark:text-orange-400">
+<span class="material-symbols-outlined text-3xl" data-icon="visibility">visibility</span>
+</div>
+<h3 class="text-xl font-bold mb-3 dark:text-slate-100">OpenCV Heatmaps</h3>
+<p class="text-on-surface-variant dark:text-slate-400 text-sm leading-relaxed mb-6">
+                        Visualize spatial importance. Our saliency maps highlight where the human eye—and the AI—focuses its attention first.
+                    </p>
+<div class="mt-auto h-32 w-full rounded-xl overflow-hidden">
+<img alt="Heatmap preview" class="w-full h-full object-cover saturate-150" data-alt="Abstract colorful light heatmap visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDuW68_XFdc-rHccdzYZvOUHhvG_sUNyzE4yQkjG4knAjWoEaWLvjNSyGJSkX2e3BMaygvyiuFPz23ClechBNFjCRTk3p50RV_LULmZea7lsEQ9dYxag1W2YFBnYTGY-Dhx5A2UP75ssqgQEr5xXXOsREtnY8JltIFJN0OUn4hNFNkCUm28McQrn00kBYFV2G3JbLok1HI8K-BIyadz7Sxv39Nz4H0XaReL4XUjYU9s8lS8YZzEKBT_W8109AWul_iGEMdZ8A3iN5w"/>
+</div>
+</div>
+<!-- Medium Feature: Scatter Plots -->
+<div class="md:col-span-8 bg-surface-container-low dark:bg-slate-900 border border-transparent dark:border-slate-800 rounded-[2rem] p-10 flex flex-col md:flex-row gap-8 items-center">
+<div class="flex-1">
+<div class="w-12 h-12 rounded-2xl bg-primary/10 dark:bg-indigo-500/20 flex items-center justify-center mb-6 text-primary dark:text-indigo-400">
+<span class="material-symbols-outlined text-3xl" data-icon="scatter_plot">scatter_plot</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 dark:text-slate-100">t-SNE Scatter Plots</h3>
+<p class="text-on-surface-variant dark:text-slate-400 leading-relaxed">
+                            Navigate high-dimensional data in 2D space. Cluster your gallery by visual similarity to discover hidden aesthetic connections.
+                        </p>
+</div>
+<div class="flex-1 bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm dark:shadow-none">
+<div class="grid grid-cols-6 gap-2">
+<!-- Simulated Cluster Plot -->
+<div class="w-full aspect-square bg-primary/10 dark:bg-indigo-400/20 rounded-full scale-50"></div>
+<div class="w-full aspect-square bg-secondary/20 dark:bg-blue-400/30 rounded-full scale-75"></div>
+<div class="w-full aspect-square bg-primary/30 dark:bg-indigo-400/40 rounded-full"></div>
+<div class="w-full aspect-square bg-primary/10 dark:bg-indigo-400/20 rounded-full scale-50"></div>
+<div class="w-full aspect-square bg-tertiary/20 dark:bg-orange-400/30 rounded-full scale-90"></div>
+<div class="w-full aspect-square bg-secondary/10 dark:bg-blue-400/20 rounded-full scale-50"></div>
+<div class="w-full aspect-square bg-primary/40 dark:bg-indigo-400/50 rounded-full scale-75"></div>
+<div class="w-full aspect-square bg-primary/10 dark:bg-indigo-400/20 rounded-full scale-50"></div>
+<div class="w-full aspect-square bg-secondary/10 dark:bg-blue-400/20 rounded-full scale-110"></div>
+<div class="w-full aspect-square bg-primary/20 dark:bg-indigo-400/30 rounded-full scale-50"></div>
+<div class="w-full aspect-square bg-tertiary/10 dark:bg-orange-400/20 rounded-full scale-75"></div>
+<div class="w-full aspect-square bg-primary/50 dark:bg-indigo-400/60 rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Methodology Section -->
+<div class="h-1 w-24 bg-primary dark:bg-indigo-500 mx-auto mb-12"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Mobile Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-[0_-10px_30px_rgba(0,0,0,0.05)] px-6 py-4 flex justify-between items-center z-50">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="main.html">
+<span class="material-symbols-outlined" data-icon="image">image</span>
+<span class="text-[10px] font-bold">Image Analyzer</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="theme.html">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+<span class="text-[10px] font-bold">Themes</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="about.html">
+<span class="material-symbols-outlined" data-icon="info" style="font-variation-settings: 'FILL' 1;">info</span>
+<span class="text-[10px] font-bold">About</span>
+</a>
+</nav>
+
+<!-- Theme Initialization Script -->
+<script>
+    function setTheme(theme) {
+        localStorage.setItem('selectedTheme', theme);
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('selectedTheme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        }
+    });
+</script>
+</body></html>

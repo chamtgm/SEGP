@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Theme Selection - Analyzer Pro</title>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@700;800&display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#8f4700",
+                        "inverse-surface": "#2d3133",
+                        "primary": "#2b3896",
+                        "on-surface": "#191c1e",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed": "#dee0ff",
+                        "primary-fixed-dim": "#bcc2ff",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-primary-container": "#cbcfff",
+                        "primary-fixed": "#dfe0ff",
+                        "surface-container": "#eceef0",
+                        "surface-tint": "#4955b3",
+                        "on-tertiary-container": "#ffc7a2",
+                        "tertiary-fixed": "#ffdcc6",
+                        "tertiary": "#6c3400",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#757684",
+                        "background": "#f7f9fb",
+                        "on-tertiary-fixed-variant": "#713700",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#2f3f92",
+                        "on-secondary-fixed": "#00105b",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1e",
+                        "on-surface-variant": "#454652",
+                        "on-primary-fixed": "#000c62",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed-dim": "#bac3ff",
+                        "on-tertiary-fixed": "#301400",
+                        "on-primary-fixed-variant": "#303c9a",
+                        "tertiary-fixed-dim": "#ffb784",
+                        "surface": "#f7f9fb",
+                        "inverse-primary": "#bcc2ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#96a5ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "primary-container": "#4551af",
+                        "outline-variant": "#c5c5d4",
+                        "on-secondary-container": "#27378a",
+                        "surface-container-low": "#f2f4f6",
+                        "secondary": "#4858ab"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+</head>
+<body class="bg-[#f7f9fb] dark:bg-slate-950 text-on-surface dark:text-slate-200 antialiased transition-colors duration-300">
+
+    <!-- Side Navigation Shell (Desktop) -->
+    <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-[#f2f4f6] dark:bg-slate-900 flex-col p-4 gap-2 z-40">
+        <div class="mb-8 px-2 py-4">
+            <h1 class="text-lg font-bold text-[#2b3896] dark:text-indigo-400">Analyzer Pro</h1>
+            <p class="text-[10px] uppercase tracking-widest text-[#454652] opacity-60">Creative Intelligence</p>
+        </div>
+        <nav class="flex flex-col gap-1 flex-1">
+            <a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="main.html">
+                <span class="material-symbols-outlined" data-icon="image">image</span>
+                <span>Image Analyzer</span>
+            </a>
+            <!-- ACTIVE TAB: Themes -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 text-[#2b3896] dark:text-indigo-300 rounded-xl shadow-sm hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="theme.html">
+                <span class="material-symbols-outlined" data-icon="palette" style="font-variation-settings: 'FILL' 1;">palette</span>
+                <span>Themes</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="about.html">
+                <span class="material-symbols-outlined" data-icon="info">info</span>
+                <span>About</span>
+            </a>       
+        </nav>
+        <div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/10 pt-4">
+        </div>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="md:ml-64 min-h-screen pb-20 md:pb-0">
+        <!-- Top Nav Bar -->
+        <header class="flex justify-between items-center w-full px-8 py-4 bg-[#f7f9fb] dark:bg-slate-950 sticky top-0 z-30">
+            <div class="flex items-center gap-8">
+                <span class="text-xl font-black text-[#2b3896] dark:text-indigo-400 font-['Manrope'] tracking-tight">Digital Curator</span>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="max-w-6xl mx-auto px-8 py-12">
+            <!-- Header Section -->
+            <header class="mb-12">
+                <h1 class="font-headline font-extrabold text-4xl text-primary dark:text-indigo-400 tracking-tight mb-3">Visual Environment</h1>
+                <p class="font-body text-on-surface-variant dark:text-slate-400 text-lg max-w-2xl">Tailor your workspace aesthetic for maximum creative focus.</p>
+            </header>
+
+            <!-- Theme Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Light Theme Card -->
+                <div class="flex flex-col group">
+                    <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high dark:bg-slate-800 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
+                        <div class="absolute inset-0 bg-[#f7f9fb] flex flex-col p-4 border border-outline-variant/10">
+                            <div class="w-full h-4 bg-surface-container rounded mb-3"></div>
+                            <div class="flex gap-2 mb-6">
+                                <div class="w-1/3 h-24 bg-white rounded-lg shadow-sm"></div>
+                                <div class="w-2/3 h-24 bg-white rounded-lg shadow-sm"></div>
+                            </div>
+                            <div class="mt-auto flex justify-end">
+                                <div class="w-12 h-4 bg-primary/20 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+                    </div>
+                    <h3 class="font-headline font-bold text-xl text-on-surface dark:text-slate-200 mb-1">Light</h3>
+                    <p class="text-sm text-on-surface-variant dark:text-slate-400 mb-6">Clean, clinical, and precise. Ideal for high-detail color analysis in bright environments.</p>
+                    <button class="mt-auto w-full py-3 px-6 bg-surface-container-high dark:bg-slate-800 hover:bg-surface-container dark:hover:bg-slate-700 text-primary dark:text-indigo-300 font-bold rounded-xl transition-all active:scale-[0.98]" onclick="setTheme('light')">
+                        Select Theme
+                    </button>
+                </div>
+
+                <!-- Dark Theme Card -->
+                <div class="flex flex-col group">
+                    <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#191c1e] dark:bg-slate-900 border border-slate-800/50 mb-4 shadow-sm group-hover:shadow-md transition-shadow">
+                        <div class="absolute inset-0 bg-[#1f2023] flex flex-col p-4">
+                            <div class="w-full h-4 bg-[#2b2d31] rounded mb-3"></div>
+                            <div class="flex gap-2 mb-6">
+                                <div class="w-1/3 h-24 bg-[#191c1e] rounded-lg border border-[#2b2d31]"></div>
+                                <div class="w-2/3 h-24 bg-[#191c1e] rounded-lg border border-[#2b2d31]"></div>
+                            </div>
+                            <div class="mt-auto flex justify-end">
+                                <div class="w-12 h-4 bg-primary-container/40 rounded"></div>
+                            </div>
+                        </div>
+                        <div class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></div>
+                    </div>
+                    <h3 class="font-headline font-bold text-xl text-on-surface dark:text-slate-200 mb-1">Dark</h3>
+                    <p class="text-sm text-on-surface-variant dark:text-slate-400 mb-6">Deep contrast and reduced eye strain. Best for long analysis sessions in low-light studios.</p>
+                    <button class="mt-auto w-full py-3 px-6 bg-surface-container-high dark:bg-slate-800 hover:bg-surface-container dark:hover:bg-slate-700 text-primary dark:text-indigo-300 font-bold rounded-xl transition-all active:scale-[0.98]" onclick="setTheme('dark')">
+                        Select Theme
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom NavBar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-outline-variant/10 dark:border-slate-800 px-6 py-4 flex justify-between items-center z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] text-sm">
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors" href="main.html">
+            <span class="material-symbols-outlined" data-icon="image">image</span>
+            <span class="text-[10px] font-bold">Image Analyzer</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-primary dark:text-indigo-400" href="theme.html">
+            <span class="material-symbols-outlined" data-icon="palette" style="font-variation-settings: 'FILL' 1;">palette</span>
+            <span class="text-[10px] font-bold">Themes</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors" href="about.html">
+            <span class="material-symbols-outlined" data-icon="info">info</span>
+            <span class="text-[10px] font-bold">About</span>
+        </a>
+    </nav>
+
+    <!-- Background Asset Mockups for alt data -->
+    <div class="hidden">
+        <img data-alt="Screenshot of clean white interface with indigo accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsrLdgyUwIijRQigfcuTS7eUa4_3_497fghF2ZUtCPQnLQ1THt0t6SH-BbiO8GspEFXp_lNKPEHd22pu32wI5E0EZ7SukAg4XDuVQUGWKB8mIodxuPJbV6_hFjnK2HxNcIRwonSZwWCQNOFnjULrLhThzJ_6ncMJ4UsxeL54jtmhAJs1AmqrcTQgJ93hDV7V8jv7graN0SFltbY6atKBWp0vseKjK3K0nr1E26Zlsxf_--TDWGBizjtL3d0l3--kWOE0GEaWuMr1E"/>
+        <img data-alt="Screenshot of charcoal grey interface with high contrast blue highlights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDcDuapqb2EuHv8nMlr7evGWgTp8FsJ1i4InWI16GNT40a_4GRkPXNr6tQOneR8h21Nnv4d9e27O5ZLa96AJuTto9IX0_ct3zdWDk-myW8pl2OUhwGS9stLHTlZh6WV09z_t-Y1CoLrR5s-RyOxfwbGBL9Zo4DtKcbAnJjCMhpPxvbx44_hqBfK_i21odFVozhL-CBT8lPNlXxa3wxeCs8M0NYD_LxI4jrdg6mZwL3TynqIMeH7kxARVUVM3hZsvW2NqA2-2cvDoFI"/>
+        <img data-alt="Screenshot of premium deep indigo editorial dashboard with glassmorphism cards" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU2RfDWIrE1jF1UGejOZH5TkmCYmHIUGny7tyXWPEwBzA9Ld1RhfcglL5W9iJuP5PJjgw-_yJj8yXsjCtlVG-eeAwmx3CRYx9RCJAYbuDQmRtzz01jzCLE4PV1goSTZNyZHRLIQyInWHoa2uvm4PohYlnAZEdKyb-udeKSsMm-t2OJYWSNteMNhL87X7559UbGAVU-lOoxPzZC95meVOh5eUB_faRX8Rbj5LwTUHRQoJTpdSpT6so6iIwde3H8I-gG99aZg00PE2Y"/>
+    </div>
+
+    <!-- Theme Switching Script -->
+    <script>
+        function setTheme(theme) {
+            localStorage.setItem('selectedTheme', theme);
+            if (theme === 'dark' || theme === 'neon') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('selectedTheme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
+        });
+
+        // Basic toggle interaction for the UI sliders
+        function toggleSwitch(element) {
+            const knob = element.querySelector('div');
+            
+            // Toggle active styling
+            if (element.classList.contains('bg-surface-container-high')) {
+                element.classList.replace('bg-surface-container-high', 'bg-primary-container');
+                knob.classList.replace('bg-outline-variant', 'bg-white');
+                knob.classList.remove('left-1');
+                knob.classList.add('right-1');
+            } else {
+                element.classList.replace('bg-primary-container', 'bg-surface-container-high');
+                knob.classList.replace('bg-white', 'bg-outline-variant');
+                knob.classList.remove('right-1');
+                knob.classList.add('left-1');
+            }
+        }
+    </script>
+</body>
+</html>

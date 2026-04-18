@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Analyzer Pro - Digital Curator</title>
+    
+    <!-- Fonts and External Scripts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- External Stylesheet -->
+    <link rel="stylesheet" href="main.css">
+    
+    <!-- Tailwind Config -->
+    <script id="tailwind-config">
+          tailwind.config = {
+            darkMode: "class",
+            theme: {
+              extend: {
+                colors: {
+                  "on-secondary-fixed-variant": "#2f3f92",
+                  "on-secondary": "#ffffff",
+                  "primary": "#2b3896",
+                  "surface-bright": "#f7f9fb",
+                  "primary-fixed": "#dfe0ff",
+                  "inverse-primary": "#bcc2ff",
+                  "tertiary-fixed-dim": "#ffb784",
+                  "background": "#f7f9fb",
+                  "primary-fixed-dim": "#bcc2ff",
+                  "on-background": "#191c1e",
+                  "surface": "#f7f9fb",
+                  "on-primary-fixed-variant": "#303c9a",
+                  "on-primary": "#ffffff",
+                  "surface-variant": "#e0e3e5",
+                  "inverse-on-surface": "#eff1f3",
+                  "outline-variant": "#c5c5d4",
+                  "on-tertiary-fixed": "#301400",
+                  "secondary-fixed": "#dee0ff",
+                  "surface-dim": "#d8dadc",
+                  "surface-container-lowest": "#ffffff",
+                  "tertiary-container": "#8f4700",
+                  "surface-container-low": "#f2f4f6",
+                  "secondary-container": "#96a5ff",
+                  "surface-container-highest": "#e0e3e5",
+                  "on-tertiary-fixed-variant": "#713700",
+                  "on-primary-fixed": "#000c62",
+                  "secondary": "#4858ab",
+                  "primary-container": "#4551af",
+                  "tertiary": "#6c3400",
+                  "on-tertiary-container": "#ffc7a2",
+                  "surface-container-high": "#e6e8ea",
+                  "on-surface-variant": "#454652",
+                  "on-primary-container": "#cbcfff",
+                  "inverse-surface": "#2d3133",
+                  "tertiary-fixed": "#ffdcc6",
+                  "surface-container": "#eceef0",
+                  "error": "#ba1a1a",
+                  "error-container": "#ffdad6",
+                  "on-secondary-container": "#27378a",
+                  "on-error": "#ffffff",
+                  "on-error-container": "#93000a",
+                  "surface-tint": "#4955b3",
+                  "on-surface": "#191c1e",
+                  "outline": "#757684",
+                  "on-secondary-fixed": "#00105b",
+                  "secondary-fixed-dim": "#bac3ff",
+                  "on-tertiary": "#ffffff"
+                },
+                fontFamily: {
+                  "headline": ["Manrope"],
+                  "body": ["Inter"],
+                  "label": ["Inter"]
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+              },
+            },
+          }
+    </script>
+</head>
+<body class="bg-surface dark:bg-slate-950 text-on-surface dark:text-slate-200 font-body selection:bg-primary-fixed selection:text-on-primary-fixed overflow-x-hidden transition-colors duration-300">
+
+    <!-- Sidebar Navigation -->
+    <aside class="hidden md:flex fixed left-0 top-0 h-full w-64 bg-[#f2f4f6] dark:bg-slate-900 flex-col p-4 gap-2 z-40">
+        <div class="mb-8 px-2 py-4">
+            <h1 class="text-lg font-bold text-[#2b3896] dark:text-indigo-400">Analyzer Pro</h1>
+            <p class="text-[10px] uppercase tracking-widest text-[#454652] opacity-60">Creative Intelligence</p>
+        </div>
+        <nav class="flex flex-col gap-1 flex-1">
+            <!-- ACTIVE TAB: Image Analyzer -->
+            <a class="flex items-center gap-3 px-4 py-3 bg-white dark:bg-slate-800 text-[#2b3896] dark:text-indigo-300 rounded-xl shadow-sm hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="main.html">
+                <span class="material-symbols-outlined" data-icon="image" style="font-variation-settings: 'FILL' 1;">image</span>
+                <span>Image Analyzer</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="theme.html">
+                <span class="material-symbols-outlined" data-icon="palette">palette</span>
+                <span>Themes</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 text-[#454652] dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/50 rounded-xl hover:translate-x-1 transition-transform duration-200 font-semibold text-sm" href="about.html">
+                <span class="material-symbols-outlined" data-icon="info">info</span>
+                <span>About</span>
+            </a>       
+        </nav>
+        <div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/10 pt-4">
+        </div>
+    </aside>
+
+    <!-- Main Canvas Area -->
+    <main class="md:ml-64 min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="flex justify-between items-center w-full px-8 py-4 bg-[#f7f9fb] dark:bg-slate-950 sticky top-0 z-30">
+            <div class="flex items-center gap-4">
+                <span class="text-xl font-black text-[#2b3896] dark:text-indigo-400 font-headline tracking-tight">Digital Curator</span>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <div class="p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 max-w-[1600px] mx-auto w-full">
+            <!-- Left Column: Input & Preview -->
+            <section class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Action Row -->
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-headline font-extrabold text-primary dark:text-indigo-400 tracking-tight">Active Analysis</h2>
+                    <div class="flex gap-2">
+                        <label class="flex items-center gap-1 px-3 py-2 bg-surface-container-lowest dark:bg-slate-800 border border-outline-variant/20 dark:border-slate-700 rounded-xl text-on-surface-variant dark:text-slate-300 font-bold text-sm shadow-sm hover:bg-surface-container-low dark:hover:bg-slate-700 transition-colors cursor-pointer">
+                            <span class="material-symbols-outlined text-base" data-icon="image">image</span>
+                            <span>Photo</span>
+                            <input type="file" id="file" accept="image/*" class="hidden">
+                        </label>
+                        <input type="file" id="cameraFile" accept="image/*" capture="environment" class="hidden">
+                        <button id="cameraButton" class="flex items-center gap-1 px-3 py-2 bg-gradient-to-br from-primary to-primary-container text-white rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-base" data-icon="photo_camera">photo_camera</span>
+                            <span>Cam</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Camera Context Controls -->
+                <div id="cameraControls" class="flex justify-end gap-2 w-full" style="display: none">
+                    <button id="captureButton" class="px-3 py-2 bg-primary dark:bg-indigo-600 text-white rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all">📸</button>
+                    <button id="stopButton" class="px-3 py-2 bg-surface-container-highest dark:bg-slate-800 border border-outline-variant/20 dark:border-slate-700 rounded-xl text-on-surface-variant dark:text-slate-300 font-bold text-sm shadow-sm hover:bg-surface-container-low dark:hover:bg-slate-700 transition-colors">⏸️</button>
+                    <button id="retakeButton" class="px-3 py-2 bg-surface-container-highest dark:bg-slate-800 border border-outline-variant/20 dark:border-slate-700 rounded-xl text-on-surface-variant dark:text-slate-300 font-bold text-sm shadow-sm hover:bg-surface-container-low dark:hover:bg-slate-700 transition-colors">↺</button>
+                </div>
+
+                <!-- Preview Container -->
+                <div class="relative group aspect-square lg:aspect-auto lg:h-[300px] bg-surface-container-highest dark:bg-slate-900 rounded-2xl overflow-hidden shadow-2xl shadow-primary/5 ring-1 ring-outline-variant/10 dark:ring-white/10 flex justify-center items-center">
+                    <video id="camera" autoplay playsinline class="w-full h-full object-cover" style="display: none"></video>
+                    <img id="preview" alt="Analysis Preview" class="w-full h-full object-contain transition-all duration-700 pointer-events-auto" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+                    <canvas id="detection-overlay" class="absolute inset-0 w-full h-full pointer-events-none" style="display: none; object-fit: contain;"></canvas>
+                    
+                    <div class="absolute top-4 left-4 flex flex-col gap-2 pointer-events-none">
+                        <div id="status-badge" class="px-3 py-1 bg-black/40 backdrop-blur-md rounded-lg text-white text-[10px] font-mono tracking-widest uppercase">READY</div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="bg-surface-container-low dark:bg-slate-800 p-4 rounded-xl flex flex-col gap-4">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input id="heatmapColor" checked="" class="w-4 h-4 rounded border-outline-variant text-primary dark:text-indigo-500 focus:ring-primary/20 dark:focus:ring-indigo-500/20 dark:bg-slate-700" type="checkbox">
+                            <span class="text-xs font-semibold text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-indigo-400 transition-colors">Heatmap</span>
+                        </label>
+                        <select id="heatmapColormap" class="bg-transparent border-none text-xs font-bold text-primary dark:text-indigo-400 p-0 pr-6 focus:ring-0 cursor-pointer dark:bg-slate-800">
+                            <option value="jet" selected>jet</option>
+                            <option value="hot">hot</option>
+                            <option value="viridis">viridis</option>
+                            <option value="plasma">plasma</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-[10px] font-bold uppercase text-outline dark:text-slate-500 tracking-wider">Alpha</span>
+                        <input id="heatmapAlpha" class="flex-1 h-1 bg-outline-variant dark:bg-slate-700 rounded-full appearance-none cursor-pointer accent-primary dark:accent-indigo-500" type="range" min="0" max="1" step="0.1" value="0.7">
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer group">
+                        <input id="tsnePopup" checked="" class="w-4 h-4 rounded border-outline-variant text-primary dark:text-indigo-500 focus:ring-primary/20 dark:focus:ring-indigo-500/20 dark:bg-slate-700" type="checkbox">
+                        <span class="text-xs font-semibold text-on-surface-variant dark:text-slate-400 group-hover:text-primary dark:group-hover:text-indigo-400 transition-colors">t-SNE Mapping</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Middle Column: Model 1 Results -->
+            <section class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Prediction Header Card -->
+                <div class="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-2xl shadow-sm ring-1 ring-outline-variant/10 dark:ring-white/10">
+                    <div class="flex flex-col gap-1 mb-4">
+                        <span id="model1-name" class="text-[10px] font-bold uppercase tracking-[0.1em] text-outline dark:text-slate-500">Model 1 (Port 8001)</span>
+                        <div id="primary-summary-1" style="display: none;">
+                            <h3 id="predicted-class-text-1" class="text-2xl font-headline font-extrabold text-primary dark:text-indigo-400">Waiting...</h3>
+                            <div class="flex items-end gap-2 mb-2">
+                                <span id="confidence-text-1" class="text-4xl font-black text-on-surface dark:text-slate-100 tracking-tighter">0.0</span>
+                                <span class="text-lg font-bold text-primary dark:text-indigo-400 mb-1">%</span>
+                            </div>
+                            <div class="w-full h-2 bg-primary-fixed dark:bg-slate-800 rounded-sm overflow-hidden mt-3">
+                                <div id="progress-fill-1" class="h-full bg-primary dark:bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="detections-panel-1" class="mt-4 flex flex-col gap-2" style="display: none;">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-widest">Detected Segments</h4>
+                            <span id="detections-count-1" class="text-[10px] font-mono font-bold text-primary dark:text-indigo-300">0</span>
+                        </div>
+                        <ul id="detections-items-1" class="text-xs text-on-surface dark:text-slate-300 flex flex-col gap-2"></ul>
+                    </div>
+                </div>
+
+                <!-- Heatmap Display -->
+                <div class="relative group aspect-square bg-surface-container-highest dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm ring-1 ring-outline-variant/10 dark:ring-white/10 flex justify-center items-center">
+                    <img id="preview1-overlay" class="w-full h-full object-contain transition-all duration-700 absolute inset-0 opacity-0" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+                    <img id="heatmap1" alt="Heatmap 1" class="absolute inset-0 w-full h-full object-contain pointer-events-none" style="display:none; image-rendering:auto; filter: blur(0.35px); transform: translateZ(0);">
+                    <span class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded">Model 1 Heatmap</span>
+                    <div id="heatmap-loading-1" class="absolute inset-0 flex items-center justify-center bg-surface-container-highest/80 dark:bg-slate-900/80 backdrop-blur-sm z-10" style="display: none;">
+                        <span class="material-symbols-outlined animate-spin text-primary dark:text-indigo-400 text-4xl">autorenew</span>
+                    </div>
+                </div>
+
+                <!-- Chart Analysis Canvas -->
+                <div id="tsne-img-section-1" class="bg-surface-container-high dark:bg-slate-800 p-6 rounded-2xl flex-1 flex flex-col min-h-[250px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xs font-bold text-on-surface dark:text-slate-200 uppercase tracking-widest">Model 1 · t-SNE Map</h4>
+                        <div class="flex items-center gap-2">
+                            <button id="nn-prev-1" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Prev</button>
+                            <span id="nn-slide-label-1" class="text-[10px] bg-primary/10 dark:bg-indigo-500/20 text-primary dark:text-indigo-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide">0/0</span>
+                            <button id="nn-next-1" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Next</button>
+                            <button onclick="toggleTsneImgFullscreen(1)" class="p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors focus:outline-none" title="Full Screen">
+                                <span id="tsne-img-fs-icon-1" class="material-symbols-outlined text-sm leading-none">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tsne-img-wrapper-1" class="p-2 bg-white/40 dark:bg-slate-900/50 rounded-xl relative w-full h-full flex items-center justify-center min-h-[200px]">
+                        <img id="tsne-image-target-1" class="w-full h-full object-contain" style="display: none;" />
+                    </div>
+                    <!-- Nearest Neighbors List -->
+                    <div id="nn-list-1" class="mt-4 flex flex-col gap-2" style="display: none;">
+                        <h5 class="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-widest">Closest Matches</h5>
+                        <ul id="nn-items-1" class="text-xs text-on-surface dark:text-slate-300 flex flex-col gap-2"></ul>
+                    </div>
+                </div>
+
+                <!-- t-SNE section — hidden until results arrive -->
+                <div id="tsne-section-1" class="bg-surface-container-high dark:bg-slate-800 p-6 rounded-2xl flex flex-col gap-4 min-h-[300px]" style="display:none;">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-on-surface dark:text-slate-200 uppercase tracking-widest">Model 1 · Nearest Neighbors</h4>
+                        <div class="flex items-center gap-2">
+                            <button id="tsne-prev-1" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Prev</button>
+                            <span id="tsne-slide-label-1" class="text-[10px] bg-primary/10 dark:bg-indigo-500/20 text-primary dark:text-indigo-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide hidden sm:block">0/0</span>
+                            <button id="tsne-next-1" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Next</button>
+                            <span class="text-[10px] bg-primary/10 dark:bg-indigo-500/20 text-primary dark:text-indigo-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide hidden sm:block">Interactive Map</span>
+                            <button onclick="toggleTsneFullscreen(1)" class="p-1.5 flex items-center justify-center bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors text-slate-600 dark:text-slate-300 focus:outline-none shadow-sm" title="Full Screen">
+                                <span id="tsne-fs-icon-1" class="material-symbols-outlined text-base leading-none">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tsne-wrapper-1" class="p-2 bg-white/40 dark:bg-slate-900/50 rounded-xl relative w-full flex items-center justify-center min-h-[240px]">
+                        <canvas id="tsne-chart1" style="width:100%;height:240px;display:block;"></canvas>
+                        <div id="tsne-loading-1" class="absolute inset-0 flex items-center justify-center bg-surface-container-high/80 dark:bg-slate-800/80 backdrop-blur-sm z-10 rounded-xl" style="display: none;">
+                            <span class="material-symbols-outlined animate-spin text-primary dark:text-indigo-400 text-4xl">autorenew</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Model 2 Results -->
+            <section class="lg:col-span-4 flex flex-col gap-6">
+                <!-- Prediction Header Card -->
+                <div class="bg-surface-container-lowest dark:bg-slate-900 p-6 rounded-2xl shadow-sm ring-1 ring-outline-variant/10 dark:ring-white/10">
+                    <div class="flex flex-col gap-1 mb-4">
+                        <span id="model2-name" class="text-[10px] font-bold uppercase tracking-[0.1em] text-outline dark:text-slate-500">Model 2 (Port 8002)</span>
+                        <div id="primary-summary-2" style="display: none;">
+                            <h3 id="predicted-class-text-2" class="text-2xl font-headline font-extrabold text-teal-600 dark:text-teal-400">Waiting...</h3>
+                            <div class="flex items-end gap-2 mb-2">
+                                <span id="confidence-text-2" class="text-4xl font-black text-on-surface dark:text-slate-100 tracking-tighter">0.0</span>
+                                <span class="text-lg font-bold text-teal-600 dark:text-teal-400 mb-1">%</span>
+                            </div>
+                            <div class="w-full h-2 bg-teal-100 dark:bg-slate-800 rounded-sm overflow-hidden mt-3">
+                                <div id="progress-fill-2" class="h-full bg-teal-600 dark:bg-teal-500 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="detections-panel-2" class="mt-4 flex flex-col gap-2" style="display: none;">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-widest">Detected Segments</h4>
+                            <span id="detections-count-2" class="text-[10px] font-mono font-bold text-teal-700 dark:text-teal-300">0</span>
+                        </div>
+                        <ul id="detections-items-2" class="text-xs text-on-surface dark:text-slate-300 flex flex-col gap-2"></ul>
+                    </div>
+                </div>
+
+                <!-- Heatmap Display -->
+                <div class="relative group aspect-square bg-surface-container-highest dark:bg-slate-900 rounded-2xl overflow-hidden shadow-sm ring-1 ring-outline-variant/10 dark:ring-white/10 flex justify-center items-center">
+                    <img id="preview2-overlay" class="w-full h-full object-contain transition-all duration-700 absolute inset-0 opacity-0" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" style="display: none;">
+                    <img id="heatmap2" alt="Heatmap 2" class="absolute inset-0 w-full h-full object-contain pointer-events-none" style="display:none; image-rendering:auto; filter: blur(0.35px); transform: translateZ(0);">
+                    <span class="absolute bottom-2 right-2 text-[10px] bg-black/50 text-white px-2 py-1 rounded">Model 2 Heatmap</span>
+                    <div id="heatmap-loading-2" class="absolute inset-0 flex items-center justify-center bg-surface-container-highest/80 dark:bg-slate-900/80 backdrop-blur-sm z-10" style="display: none;">
+                        <span class="material-symbols-outlined animate-spin text-teal-600 dark:text-teal-400 text-4xl">autorenew</span>
+                    </div>
+                </div>
+
+                <!-- Chart Analysis Canvas -->
+                <div id="tsne-img-section-2" class="bg-surface-container-high dark:bg-slate-800 p-6 rounded-2xl flex-1 flex flex-col min-h-[250px]">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-xs font-bold text-on-surface dark:text-slate-200 uppercase tracking-widest">Model 2 · t-SNE Map</h4>
+                        <div class="flex items-center gap-2">
+                            <button id="nn-prev-2" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Prev</button>
+                            <span id="nn-slide-label-2" class="text-[10px] bg-teal-500/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide">0/0</span>
+                            <button id="nn-next-2" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Next</button>
+                            <button onclick="toggleTsneImgFullscreen(2)" class="p-1 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors focus:outline-none" title="Full Screen">
+                                <span id="tsne-img-fs-icon-2" class="material-symbols-outlined text-sm leading-none">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tsne-img-wrapper-2" class="p-2 bg-white/40 dark:bg-slate-900/50 rounded-xl relative w-full h-full flex items-center justify-center min-h-[200px]">
+                        <img id="tsne-image-target-2" class="w-full h-full object-contain" style="display: none;" />
+                    </div>
+                    <!-- Nearest Neighbors List -->
+                    <div id="nn-list-2" class="mt-4 flex flex-col gap-2" style="display: none;">
+                        <h5 class="text-[10px] font-bold text-on-surface-variant dark:text-slate-400 uppercase tracking-widest">Closest Matches</h5>
+                        <ul id="nn-items-2" class="text-xs text-on-surface dark:text-slate-300 flex flex-col gap-2"></ul>
+                    </div>
+                </div>
+
+                <!-- t-SNE section — hidden until results arrive -->
+                <div id="tsne-section-2" class="bg-surface-container-high dark:bg-slate-800 p-6 rounded-2xl flex flex-col gap-4 min-h-[300px]" style="display:none;">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-on-surface dark:text-slate-200 uppercase tracking-widest">Model 2 · Nearest Neighbors</h4>
+                        <div class="flex items-center gap-2">
+                            <button id="tsne-prev-2" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Prev</button>
+                            <span id="tsne-slide-label-2" class="text-[10px] bg-teal-500/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide hidden sm:block">0/0</span>
+                            <button id="tsne-next-2" class="px-2 py-1 text-[10px] font-bold rounded-lg border border-outline-variant/30 dark:border-slate-700 text-on-surface-variant dark:text-slate-300 disabled:opacity-40" disabled>Next</button>
+                            <span class="text-[10px] bg-teal-500/10 dark:bg-teal-500/20 text-teal-700 dark:text-teal-300 px-2 py-1 rounded-lg font-bold uppercase tracking-wide hidden sm:block">Interactive Map</span>
+                            <button onclick="toggleTsneFullscreen(2)" class="p-1.5 flex items-center justify-center bg-white dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors text-slate-600 dark:text-slate-300 focus:outline-none shadow-sm" title="Full Screen">
+                                <span id="tsne-fs-icon-2" class="material-symbols-outlined text-base leading-none">fullscreen</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tsne-wrapper-2" class="p-2 bg-white/40 dark:bg-slate-900/50 rounded-xl relative w-full flex items-center justify-center min-h-[240px]">
+                        <canvas id="tsne-chart2" style="width:100%;height:240px;display:block;"></canvas>
+                        <div id="tsne-loading-2" class="absolute inset-0 flex items-center justify-center bg-surface-container-high/80 dark:bg-slate-800/80 backdrop-blur-sm z-10 rounded-xl" style="display: none;">
+                            <span class="material-symbols-outlined animate-spin text-teal-600 dark:text-teal-400 text-4xl">autorenew</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Mobile Bottom NavBar -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-outline-variant/10 dark:border-slate-800 px-6 py-4 flex justify-between items-center z-50 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] text-sm">
+        <a class="flex flex-col items-center gap-1 text-primary dark:text-indigo-400" href="main.html">
+            <span class="material-symbols-outlined" data-icon="image" style="font-variation-settings: 'FILL' 1;">image</span>
+            <span class="text-[10px] font-bold">Image Analyzer</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors" href="theme.html">
+            <span class="material-symbols-outlined" data-icon="palette">palette</span>
+            <span class="text-[10px] font-bold">Themes</span>
+        </a>
+        <a class="flex flex-col items-center gap-1 text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors" href="about.html">
+            <span class="material-symbols-outlined" data-icon="info">info</span>
+            <span class="text-[10px] font-bold">About</span>
+        </a>
+    </nav>
+    
+    <script>
+        let chartInstances = { 1: null, 2: null };
+        let tsneChartInstances = { 1: null, 2: null };
+        let nnSlideState = {
+            1: { items: [], index: 0 },
+            2: { items: [], index: 0 },
+        };
+        // TODO: Update these URLs with the new ones from your terminals:
+        const backend1 = `https://gregory-overplain-lucratively.ngrok-free.dev`;
+        const backend2 = `https://latashia-incognizant-youlanda.ngrok-free.dev`;
+        
+        const camera = document.getElementById('camera');
+        const preview = document.getElementById('preview');
+        const preview1Overlay = document.getElementById('preview1-overlay');
+        const preview2Overlay = document.getElementById('preview2-overlay');
+        const cameraButton = document.getElementById('cameraButton');
+        const captureButton = document.getElementById('captureButton');
+        const stopButton = document.getElementById('stopButton');
+        const retakeButton = document.getElementById('retakeButton');
+        const cameraControls = document.getElementById('cameraControls');
+        const toggleBtn = document.getElementById("toggleSidebar");
+        const sidebar = document.querySelector(".sidebar");
+        let stream = null;
+
+        if (toggleBtn && sidebar) {
+            toggleBtn.addEventListener("click", () => {
+                const isHidden = sidebar.classList.contains('hidden');
+                if (isHidden) {
+                    sidebar.classList.remove('hidden');
+                    sidebar.classList.add('flex');
+                } else {
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('flex');
+                }
+            });
+        }
+        
+        const cameraFile = document.getElementById('cameraFile');
+        const hasLiveCamera = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+        if (!hasLiveCamera && cameraButton) {
+            console.warn('Live camera not available; using file capture fallback');
+            const span = cameraButton.querySelector('span:nth-child(2)');
+            if(span) span.textContent = 'Take Photo📸';
+        }
+
+        // File upload handler
+        document.getElementById('file').onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await handleImage(file);
+        };
+
+        // Camera-file capture handler (mobile fallback)
+        cameraFile.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await handleImage(file);
+            cameraFile.value = '';
+        };
+
+        // Camera handlers
+        if(cameraButton){
+            cameraButton.onclick = async () => {
+                if (!hasLiveCamera) {
+                    cameraFile.click();
+                    return;
+                }
+                try {
+                    const constraints = {
+                        video: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        }
+                    };
+
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    camera.srcObject = stream;
+                    camera.style.display = 'block';
+                    preview.style.display = 'none';
+                    if (document.getElementById('heatmap1')) document.getElementById('heatmap1').style.display = 'none';
+                    if (document.getElementById('heatmap2')) document.getElementById('heatmap2').style.display = 'none';
+                    if (document.getElementById('preview1-overlay')) document.getElementById('preview1-overlay').style.display = 'none';
+                    if (document.getElementById('preview2-overlay')) document.getElementById('preview2-overlay').style.display = 'none';
+                    cameraControls.style.display = 'flex';
+
+                    await new Promise((resolve) => {
+                        camera.onloadedmetadata = () => {
+                            camera.play().then(resolve);
+                        };
+                    });
+
+                } catch (err) {
+                    console.error('Camera error:', err);
+                    alert('Camera access denied or error: ' + err.message);
+                }
+            };
+        }
+
+        if(captureButton){
+            captureButton.onclick = () => {
+                if (!camera.videoWidth) {
+                    alert('Camera not ready yet. Please wait.');
+                    return;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = camera.videoWidth;
+                canvas.height = camera.videoHeight;
+                canvas.getContext('2d').drawImage(camera, 0, 0);
+                
+                canvas.toBlob(async (blob) => {
+                    if (!blob) {
+                        alert('Failed to capture image');
+                        return;
+                    }
+                    await handleImage(blob);
+                    stopCamera();
+                }, 'image/jpeg', 0.95); 
+            };
+        }
+
+        if(stopButton){
+            stopButton.onclick = () => {
+                stopCamera();
+            };
+        }
+
+        if(retakeButton){
+            retakeButton.onclick = () => {
+                camera.style.display = 'block';
+                preview.style.display = 'none';
+                if (document.getElementById('heatmap1')) document.getElementById('heatmap1').style.display = 'none';
+                if (document.getElementById('heatmap2')) document.getElementById('heatmap2').style.display = 'none';
+                if (document.getElementById('preview1-overlay')) document.getElementById('preview1-overlay').style.display = 'none';
+                if (document.getElementById('preview2-overlay')) document.getElementById('preview2-overlay').style.display = 'none';
+            };
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            camera.style.display = 'none';
+            preview.style.display = 'block';
+            cameraControls.style.display = 'none';
+        }
+
+        function clearPreviousResults() {
+    [1, 2].forEach(modelNum => {
+        // Reset prediction text
+        document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Analyzing...';
+        document.getElementById(`confidence-text-${modelNum}`).textContent = '0.0';
+        document.getElementById(`progress-fill-${modelNum}`).style.width = '0%';
+
+        // Reset per-detection confidence list
+        const detectionsPanel = document.getElementById(`detections-panel-${modelNum}`);
+        const detectionsItems = document.getElementById(`detections-items-${modelNum}`);
+        const detectionsCount = document.getElementById(`detections-count-${modelNum}`);
+        if (detectionsPanel) detectionsPanel.style.display = 'none';
+        if (detectionsItems) detectionsItems.innerHTML = '';
+        if (detectionsCount) detectionsCount.textContent = '0';
+
+        // Hide heatmap
+        const heatmap = document.getElementById(`heatmap${modelNum}`);
+        if (heatmap) {
+            heatmap.style.display = 'none';
+            heatmap.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+        }
+
+        // Hide preview overlay
+        const overlay = document.getElementById(`preview${modelNum}-overlay`);
+        if (overlay) {
+            overlay.style.display = 'none';
+            overlay.src = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+        }
+
+        // Hide tsne image and nn list
+        const tsneImg = document.getElementById(`tsne-image-target-${modelNum}`);
+        if (tsneImg) {
+            tsneImg.style.display = 'none';
+            tsneImg.src = '';
+        }
+        const nnList = document.getElementById(`nn-list-${modelNum}`);
+        if (nnList) nnList.style.display = 'none';
+        const nnItems = document.getElementById(`nn-items-${modelNum}`);
+        if (nnItems) nnItems.innerHTML = '';
+
+        // Hide t-SNE section and destroy its chart
+        const tsneSection = document.getElementById(`tsne-section-${modelNum}`);
+        if (tsneSection) tsneSection.style.display = 'none';
+
+        if (tsneChartInstances[modelNum]) {
+            tsneChartInstances[modelNum].destroy();
+            tsneChartInstances[modelNum] = null;
+        }
+
+        // Destroy bar chart (if it exists)
+        if (chartInstances[modelNum]) {
+            chartInstances[modelNum].destroy();
+            chartInstances[modelNum] = null;
+        }
+
+        resetNnSlide(modelNum);
+    });
+
+    // Reset detection overlay
+    const overlayCanvas = document.getElementById('detection-overlay');
+    if (overlayCanvas) {
+        const ctx = overlayCanvas.getContext('2d');
+        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        overlayCanvas.style.display = 'none';
+    }
+}
+
+        function extractItemName(pathLike) {
+            if (!pathLike) return 'Unknown';
+            const s = String(pathLike);
+            const parts = s.replace(/\\/g, '/').split('/').filter(Boolean);
+            if (parts.length === 0) return 'Unknown';
+            const last = parts[parts.length - 1];
+            return last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+        }
+
+        function resetNnSlide(modelNum) {
+            nnSlideState[modelNum] = { items: [], index: 0, globalTsne: null };
+            const label = document.getElementById(`nn-slide-label-${modelNum}`);
+            const tsneLabel = document.getElementById(`tsne-slide-label-${modelNum}`);
+            const prevBtn = document.getElementById(`nn-prev-${modelNum}`);
+            const nextBtn = document.getElementById(`nn-next-${modelNum}`);
+            const tsnePrevBtn = document.getElementById(`tsne-prev-${modelNum}`);
+            const tsneNextBtn = document.getElementById(`tsne-next-${modelNum}`);
+            if (label) label.textContent = '0/0';
+            if (tsneLabel) tsneLabel.textContent = '0/0';
+            if (prevBtn) prevBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+            if (tsnePrevBtn) tsnePrevBtn.disabled = true;
+            if (tsneNextBtn) tsneNextBtn.disabled = true;
+        }
+
+        function renderNnSlide(modelNum) {
+            const state = nnSlideState[modelNum] || { items: [], index: 0, globalTsne: null };
+            const items = Array.isArray(state.items) ? state.items : [];
+            const label = document.getElementById(`nn-slide-label-${modelNum}`);
+            const tsneLabel = document.getElementById(`tsne-slide-label-${modelNum}`);
+            const prevBtn = document.getElementById(`nn-prev-${modelNum}`);
+            const nextBtn = document.getElementById(`nn-next-${modelNum}`);
+            const tsnePrevBtn = document.getElementById(`tsne-prev-${modelNum}`);
+            const tsneNextBtn = document.getElementById(`tsne-next-${modelNum}`);
+            const tsneImg = document.getElementById(`tsne-image-target-${modelNum}`);
+            const nnListEl = document.getElementById(`nn-list-${modelNum}`);
+            const nnItemsEl = document.getElementById(`nn-items-${modelNum}`);
+            const tsneSection = document.getElementById(`tsne-section-${modelNum}`);
+
+            if (!items.length) {
+                if (label) label.textContent = '0/0';
+                if (tsneLabel) tsneLabel.textContent = '0/0';
+                if (prevBtn) prevBtn.disabled = true;
+                if (nextBtn) nextBtn.disabled = true;
+                if (tsnePrevBtn) tsnePrevBtn.disabled = true;
+                if (tsneNextBtn) tsneNextBtn.disabled = true;
+                if (tsneImg) {
+                    tsneImg.style.display = 'none';
+                    tsneImg.src = '';
+                }
+                if (nnListEl) nnListEl.style.display = 'none';
+                if (nnItemsEl) nnItemsEl.innerHTML = '';
+                if (tsneSection) tsneSection.style.display = 'none';
+                if (tsneChartInstances[modelNum]) {
+                    tsneChartInstances[modelNum].destroy();
+                    tsneChartInstances[modelNum] = null;
+                }
+                return;
+            }
+
+            const idx = Math.max(0, Math.min(state.index, items.length - 1));
+            state.index = idx;
+            const slide = items[idx] || {};
+
+            const cls = slide.majority_class || 'Unknown';
+            if (label) label.textContent = `${idx + 1}/${items.length} · ${cls}`;
+            if (tsneLabel) tsneLabel.textContent = `${idx + 1}/${items.length} · ${cls}`;
+            if (prevBtn) prevBtn.disabled = idx <= 0;
+            if (tsnePrevBtn) tsnePrevBtn.disabled = idx <= 0;
+            if (nextBtn) nextBtn.disabled = idx >= items.length - 1;
+            if (tsneNextBtn) tsneNextBtn.disabled = idx >= items.length - 1;
+
+            const tsne = state.globalTsne || slide.tsne_plot_base64 || null;
+            if (tsneImg) {
+                if (tsne) {
+                    tsneImg.src = 'data:image/png;base64,' + tsne;
+                    tsneImg.style.display = 'block';
+                } else {
+                    tsneImg.style.display = 'none';
+                    tsneImg.src = '';
+                }
+            }
+
+            const neighbors = Array.isArray(slide.nn) ? slide.nn : [];
+            if (nnListEl && nnItemsEl) {
+                if (neighbors.length > 0) {
+                    nnListEl.style.display = 'flex';
+                    nnItemsEl.innerHTML = '';
+                    neighbors.slice(0, 5).forEach((n, rank) => {
+                        const itemName = extractItemName(n.path || n[0] || '');
+                        const score = Number(n.score ?? 0);
+                        const confPct = (score * 100).toFixed(1);
+                        const li = document.createElement('li');
+                        li.className = 'flex justify-between items-center bg-surface-container dark:bg-slate-900/50 px-3 py-2 rounded-lg';
+                        li.innerHTML = `
+                            <span class="font-semibold flex items-center gap-2">
+                                <span class="text-[10px] w-4 h-4 flex items-center justify-center bg-primary/10 dark:bg-indigo-500/20 text-primary dark:text-indigo-400 rounded-full">${rank + 1}</span>
+                                ${itemName}
+                            </span>
+                            <span class="font-mono text-primary dark:text-indigo-300 font-bold">${confPct}%</span>
+                        `;
+                        nnItemsEl.appendChild(li);
+                    });
+                } else {
+                    nnListEl.style.display = 'none';
+                    nnItemsEl.innerHTML = '';
+                }
+            }
+
+            const tsneData = slide.tsne_coordinates || null;
+            if (tsneData && tsneData.input && Array.isArray(tsneData.neighbors)) {
+                showTsneChart(modelNum, tsneData, slide);
+            } else {
+                if (tsneSection) tsneSection.style.display = 'none';
+                if (tsneChartInstances[modelNum]) {
+                    tsneChartInstances[modelNum].destroy();
+                    tsneChartInstances[modelNum] = null;
+                }
+            }
+        }
+
+        function setNnSlides(modelNum, nnPayload) {
+            let items = [];
+            if (nnPayload && Array.isArray(nnPayload.detection_nn) && nnPayload.detection_nn.length > 0) {
+                items = nnPayload.detection_nn;
+            } else if (nnPayload && typeof nnPayload === 'object' && !nnPayload.error) {
+                items = [nnPayload];
+            }
+
+            const globalTsne = (nnPayload && typeof nnPayload === 'object')
+                ? (nnPayload.tsne_global_plot_base64 || nnPayload.tsne_plot_base64 || null)
+                : null;
+
+            nnSlideState[modelNum] = { items, index: 0, globalTsne };
+            renderNnSlide(modelNum);
+        }
+
+        function initNnSlideControls() {
+            [1, 2].forEach((modelNum) => {
+                const prevBtn = document.getElementById(`nn-prev-${modelNum}`);
+                const nextBtn = document.getElementById(`nn-next-${modelNum}`);
+                const tsnePrevBtn = document.getElementById(`tsne-prev-${modelNum}`);
+                const tsneNextBtn = document.getElementById(`tsne-next-${modelNum}`);
+
+                const handlePrev = () => {
+                    const state = nnSlideState[modelNum];
+                    if (!state || !state.items.length) return;
+                    state.index = Math.max(0, state.index - 1);
+                    renderNnSlide(modelNum);
+                };
+
+                const handleNext = () => {
+                    const state = nnSlideState[modelNum];
+                    if (!state || !state.items.length) return;
+                    state.index = Math.min(state.items.length - 1, state.index + 1);
+                    renderNnSlide(modelNum);
+                };
+
+                if (prevBtn && !prevBtn.dataset.bound) {
+                    prevBtn.addEventListener('click', handlePrev);
+                    prevBtn.dataset.bound = '1';
+                }
+                if (tsnePrevBtn && !tsnePrevBtn.dataset.bound) {
+                    tsnePrevBtn.addEventListener('click', handlePrev);
+                    tsnePrevBtn.dataset.bound = '1';
+                }
+
+                if (nextBtn && !nextBtn.dataset.bound) {
+                    nextBtn.addEventListener('click', handleNext);
+                    nextBtn.dataset.bound = '1';
+                }
+                if (tsneNextBtn && !tsneNextBtn.dataset.bound) {
+                    tsneNextBtn.addEventListener('click', handleNext);
+                    tsneNextBtn.dataset.bound = '1';
+                }
+            });
+        }
+
+        function renderDetectionScores(modelNum, detections, fallbackPrediction) {
+            const panel = document.getElementById(`detections-panel-${modelNum}`);
+            const items = document.getElementById(`detections-items-${modelNum}`);
+            const count = document.getElementById(`detections-count-${modelNum}`);
+            if (!panel || !items || !count) return;
+
+            items.innerHTML = '';
+
+            let rows = [];
+            if (Array.isArray(detections) && detections.length > 0) {
+                rows = detections;
+            } else if (fallbackPrediction && !fallbackPrediction.error) {
+                // Backward compatibility for older backend responses.
+                rows = [{
+                    predicted_class: fallbackPrediction.predicted_class,
+                    confidence: fallbackPrediction.confidence,
+                    raw_score: fallbackPrediction.raw_score,
+                    bbox: null,
+                    segmentation: null,
+                }];
+            }
+
+            if (rows.length === 0) {
+                panel.style.display = 'none';
+                count.textContent = '0';
+                return;
+            }
+
+            panel.style.display = 'flex';
+            count.textContent = String(rows.length);
+
+            const scoreClass = modelNum === 2
+                ? 'font-mono font-bold text-teal-700 dark:text-teal-300'
+                : 'font-mono font-bold text-primary dark:text-indigo-300';
+
+            rows.forEach((det, idx) => {
+                const cls = (det && det.predicted_class) ? String(det.predicted_class) : 'Unknown';
+
+                let confText = '0.0%';
+                if (det && typeof det.confidence === 'string' && det.confidence.trim()) {
+                    confText = det.confidence;
+                } else if (det && det.raw_score !== undefined && det.raw_score !== null) {
+                    confText = `${(Number(det.raw_score) * 100).toFixed(1)}%`;
+                }
+
+                let boxText = 'full image';
+                if (det && Array.isArray(det.bbox) && det.bbox.length === 4) {
+                    const coords = det.bbox.map(v => Math.round(Number(v) || 0));
+                    boxText = `[${coords.join(', ')}]`;
+                }
+
+                const segPts = (det && Array.isArray(det.segmentation)) ? det.segmentation.length : 0;
+                const segText = segPts > 0 ? ` | Seg pts: ${segPts}` : '';
+
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center bg-surface-container dark:bg-slate-900/50 px-3 py-2 rounded-lg gap-3';
+
+                const left = document.createElement('div');
+                left.className = 'flex flex-col min-w-0';
+
+                const title = document.createElement('span');
+                title.className = 'font-semibold truncate';
+                title.textContent = `#${idx + 1} ${cls}`;
+
+                const meta = document.createElement('span');
+                meta.className = 'text-[10px] text-on-surface-variant dark:text-slate-400 truncate';
+                meta.textContent = `Box: ${boxText}${segText}`;
+
+                left.appendChild(title);
+                left.appendChild(meta);
+
+                const right = document.createElement('span');
+                right.className = scoreClass;
+                right.textContent = confText;
+
+                li.appendChild(left);
+                li.appendChild(right);
+                items.appendChild(li);
+            });
+
+            // Draw detection overlays on the preview image if modelNum is 1
+            if (modelNum === 1 && rows.length > 0) {
+                const imgElement = document.getElementById('preview');
+                const canvasElement = document.getElementById('detection-overlay');
+                
+                if (imgElement && canvasElement && imgElement.naturalWidth) {
+                    canvasElement.width = imgElement.naturalWidth;
+                    canvasElement.height = imgElement.naturalHeight;
+                    canvasElement.style.display = 'block';
+
+                    const ctx = canvasElement.getContext('2d');
+                    ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+                    rows.forEach((det, idx) => {
+                        let labelX, labelY;
+
+                        // Draw segmentation
+                        if (det.segmentation && det.segmentation.length > 0) {
+                            ctx.beginPath();
+                            det.segmentation.forEach((point, i) => {
+                                if (i === 0) ctx.moveTo(point[0], point[1]);
+                                else ctx.lineTo(point[0], point[1]);
+                            });
+                            ctx.closePath();
+                            
+                            // Fill and stroke
+                            ctx.fillStyle = 'rgba(0, 255, 128, 0.3)';
+                            ctx.fill();
+                            ctx.strokeStyle = '#00ff80';
+                            ctx.lineWidth = Math.max(2, canvasElement.width * 0.003);
+                            ctx.stroke();
+
+                            labelX = det.segmentation[0][0];
+                            labelY = det.segmentation[0][1] - 5;
+                        } 
+                        
+                        // Draw bbox
+                        if (det.bbox && det.bbox.length === 4) {
+                            const [x1, y1, x2, y2] = det.bbox;
+                            ctx.strokeStyle = '#00ff80';
+                            ctx.lineWidth = Math.max(2, canvasElement.width * 0.003);
+                            ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                            
+                            if (labelX === undefined || labelY === undefined) {
+                                labelX = x1;
+                                labelY = y1 - 5;
+                            }
+                        }
+
+                        // Draw text label
+                        if (labelX !== undefined && labelY !== undefined) {
+                            const labelText = `#${idx + 1}`;
+                            
+                            const textHeight = Math.max(16, canvasElement.width * 0.02);
+                            ctx.font = `bold ${textHeight}px Arial, sans-serif`;
+                            
+                            const metrics = ctx.measureText(labelText);
+                            const bgWidth = metrics.width + textHeight * 0.6;
+                            const bgHeight = textHeight * 1.4;
+                            
+                            // Keep label within bounds horizontally
+                            labelX = Math.max(0, Math.min(labelX, canvasElement.width - bgWidth));
+                            // Keep label within bounds vertically
+                            labelY = Math.max(bgHeight, labelY);
+
+                            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                            ctx.fillRect(labelX, labelY - bgHeight + textHeight * 0.3, bgWidth, bgHeight);
+                            
+                            ctx.fillStyle = '#00ff80';
+                            ctx.fillText(labelText, labelX + textHeight * 0.3, labelY);
+                        }
+                    });
+                }
+            }
+        }
+
+        let isProcessing = false;
+
+        async function handleImage(blob) {
+            if (isProcessing) {
+                console.warn('Already processing an image, please wait...');
+                return;
+            }
+            isProcessing = true;
+            clearPreviousResults();
+            const url = URL.createObjectURL(blob);
+            preview.src = url;
+            preview.style.display = 'block';
+            camera.style.display = 'none';
+            
+            // Show initial loading state
+            [1, 2].forEach(modelNum => {
+                document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Connecting...';
+                document.getElementById(`confidence-text-${modelNum}`).textContent = '—';
+                document.getElementById(`progress-fill-${modelNum}`).style.width = '10%';
+            });
+            
+            try { 
+                // Defer history saving to avoid blocking
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(() => saveToLocalHistory(blob));
+                } else {
+                    setTimeout(() => saveToLocalHistory(blob), 200);
+                }
+            } catch (e) { /* ignore */ }
+
+            // Add timeout wrapper for fetch requests
+            const fetchWithTimeout = (url, options, timeout = 15000) => {
+                options = options || {};
+                options.headers = {
+                    ...options.headers,
+                    'ngrok-skip-browser-warning': '1',
+                    'bypass-tunnel-reminder': '1'
+                };
+                
+                return Promise.race([
+                    fetch(url, options),
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Request timeout')), timeout)
+                    )
+                ]);
+            };
+
+            const processModel = async (modelNum, backendUrl) => {
+                try {
+                    document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Analyzing...';
+                    document.getElementById(`confidence-text-${modelNum}`).textContent = '0.0';
+                    document.getElementById(`progress-fill-${modelNum}`).style.width = '0%';
+
+                    // Step 1: Run prediction first (highest priority)
+                    let predJson = {};
+                    try {
+                        document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Predicting...';
+                        document.getElementById(`progress-fill-${modelNum}`).style.width = '40%';
+                        
+                        const predRes = await fetchWithTimeout(`${backendUrl}/predict`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/octet-stream' },
+                            body: blob
+                        }, 10000); // 10 second timeout for prediction
+
+                        predJson = await predRes.json();
+                        if (!predRes.ok) {
+                            predJson.error = predJson.error || `HTTP ${predRes.status}`;
+                        }
+                    } catch (e) {
+                        predJson = { error: e.message.includes('timeout') ? 'Request timeout' : String(e) };
+                    }
+
+                    if (predJson.error) {
+                        document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Prediction failed';
+                        document.getElementById(`confidence-text-${modelNum}`).textContent = '0.0';
+                        document.getElementById(`progress-fill-${modelNum}`).style.width = '0%';
+                        renderDetectionScores(modelNum, [], null);
+                        console.warn(`Prediction failed for model ${modelNum}:`, predJson.error);
+                    } else {
+                        // Update Prediction Elements
+                        document.getElementById(`predicted-class-text-${modelNum}`).textContent = predJson.predicted_class;
+                        let confVal = predJson.raw_score !== undefined
+                            ? (Number(predJson.raw_score) * 100).toFixed(1)
+                            : parseFloat(predJson.confidence) || 0;
+
+                        document.getElementById(`confidence-text-${modelNum}`).textContent = confVal;
+                        document.getElementById(`progress-fill-${modelNum}`).style.width = '60%';
+
+                        // Show confidence per detected box/segmentation.
+                        renderDetectionScores(modelNum, predJson.detections, predJson);
+                    }
+
+                    // Step 2: Run heatmap (lower priority, only if prediction succeeded)
+                    if (!predJson.error) {
+                        const heatmapLoading = document.getElementById(`heatmap-loading-${modelNum}`);
+                        if (heatmapLoading) heatmapLoading.style.display = 'flex';
+                        try {
+                            document.getElementById(`progress-fill-${modelNum}`).style.width = '75%';
+                            const heatImgEl = document.getElementById(`heatmap${modelNum}`);
+                            const heatImgBgEl = document.getElementById(`preview${modelNum}-overlay`);
+                            if (heatImgEl && heatImgBgEl) {
+                                const useCv = document.getElementById('heatmapColor').checked;
+                                const cmap = (document.getElementById('heatmapColormap').value || 'jet');
+                                const alpha = (document.getElementById('heatmapAlpha').value || '0.7');
+                                const qs = new URLSearchParams();
+                                if (useCv) qs.set('cv', '1');
+                                qs.set('colormap', cmap);
+                                qs.set('alpha', alpha);
+                                
+                                if (predJson.detections && Array.isArray(predJson.detections)) {
+                                    const labels = predJson.detections.map((d, i) => `#${i + 1}`).join('|');
+                                    qs.set('labels', labels);
+                                }
+
+                                const heatRes = await fetchWithTimeout(`${backendUrl}/heatmap?${qs.toString()}`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/octet-stream' },
+                                    body: blob
+                                }, 8000); // 8 second timeout for heatmap
+
+                                if (heatRes.ok) {
+                                    const heatJson = await heatRes.json();
+                                    const data = heatJson.overlay_base64 || heatJson.heatmap_base64 || null;
+                                    if (data) {
+                                        const heatUrl = 'data:image/png;base64,' + data;
+                                        heatImgEl.src = heatUrl;
+                                        heatImgEl.style.display = 'block';
+                                        heatImgEl.style.opacity = '1';
+                                        heatImgEl.style.mixBlendMode = 'normal';
+                                        heatImgBgEl.style.display = 'none';
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn(`Heatmap failed for model ${modelNum}:`, e);
+                        } finally {
+                            if (heatmapLoading) heatmapLoading.style.display = 'none';
+                        }
+                    }
+
+                    // Step 3: Run t-SNE projection (lowest priority, optional)
+                    const tsnePopup = document.getElementById('tsnePopup');
+                    if (tsnePopup && tsnePopup.checked) {
+                        const tsneLoading = document.getElementById(`tsne-loading-${modelNum}`);
+                        if (tsneLoading) tsneLoading.style.display = 'flex';
+                        try {
+                            document.getElementById(`progress-fill-${modelNum}`).style.width = '90%';
+                            const nnRes = await fetchWithTimeout(`${backendUrl}/nn?k=5&tsne_plot=0&tsne_global=1&all_detections=1&tsne_bg_max=800`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/octet-stream' },
+                                body: blob
+                            }, 35000); // allow heavier multi-fruit t-SNE projection to complete
+
+                            if (nnRes.ok) {
+                                const nnJson = await nnRes.json();
+                                setNnSlides(modelNum, nnJson);
+                                
+                                if (nnJson.tsne_data && nnJson.tsne_data.length > 0) {
+                                    document.getElementById(`tsne-section-${modelNum}`).style.display = 'flex';
+                                    renderTsneChart(modelNum, nnJson.tsne_data, nnJson.tsne_grid);
+                                }
+                            }
+                        } catch (e) {
+                            console.warn(`t-SNE failed for model ${modelNum}:`, e);
+                        } finally {
+                            if (tsneLoading) tsneLoading.style.display = 'none';
+                        }
+                    }
+                    
+                    // Complete
+                    document.getElementById(`progress-fill-${modelNum}`).style.width = '100%';
+                    document.getElementById(`predicted-class-text-${modelNum}`).textContent = predJson.predicted_class; // Keep the final result
+                } catch (err) {
+                    document.getElementById(`predicted-class-text-${modelNum}`).textContent = 'Analysis error';
+                    console.error(`Model ${modelNum} processing error:`, err);
+                }
+            };
+
+            // Process models sequentially to avoid overwhelming the backend
+            try {
+                await processModel(1, backend1);
+                await processModel(2, backend2);
+            } catch (e) {
+                console.error('Model processing failed:', e);
+            } finally {
+                isProcessing = false;
+            }
+        }
+
+        async function saveToLocalHistory(blob) {
+            const KEY = 'uploadHistory_v1';
+            const MAX_ITEMS = 30;
+            
+            // Use requestIdleCallback or setTimeout to defer heavy processing
+            const processThumbnail = async () => {
+                try {
+                    const thumb = await blobToThumbnailDataURL(blob, 240, 0.78);
+                    const entry = { ts: Date.now(), thumb };
+                    let arr = [];
+                    try { arr = JSON.parse(localStorage.getItem(KEY) || '[]') || []; } catch (e) { arr = []; }
+                    arr.unshift(entry);
+                    if (arr.length > MAX_ITEMS) arr = arr.slice(0, MAX_ITEMS);
+                    localStorage.setItem(KEY, JSON.stringify(arr));
+                } catch (e) {
+                    console.warn('Failed to save thumbnail to history:', e);
+                }
+            };
+
+            // Defer thumbnail processing to avoid blocking UI
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(processThumbnail);
+            } else {
+                setTimeout(processThumbnail, 100);
+            }
+        }
+
+        async function blobToThumbnailDataURL(blob, maxSize, quality) {
+            const bmp = await createImageBitmap(blob);
+            const scale = Math.min(1, maxSize / Math.max(bmp.width, bmp.height));
+            const w = Math.max(1, Math.round(bmp.width * scale));
+            const h = Math.max(1, Math.round(bmp.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(bmp, 0, 0, w, h);
+            return canvas.toDataURL('image/jpeg', quality);
+        }
+
+        function formatLabelsForDisplay(labels) {
+            if (!Array.isArray(labels) || !labels.length) return '';
+            const top = labels.slice(0, 5);
+
+            function extractItemName(desc) {
+                if (!desc) return 'Unknown';
+                const s = desc.toString();
+                const afterColon = s.includes(':') ? s.split(':').slice(1).join(':').trim() : s.trim();
+                const parts = afterColon.replace(/\\/g, '/').split('/').filter(Boolean);
+                if (parts.length === 0) return 'Unknown';
+                const last = parts[parts.length - 1]; 
+                const base = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                return base || 'Unknown';
+            }
+
+            return top.map((m, idx) => {
+                const rawDesc = (m.description ?? m.label ?? '').toString().trim();
+                const item = extractItemName(rawDesc);
+                const pct = ((m.confidence ?? m.score ?? 0) * 100).toFixed(1);
+                return `Match ${idx + 1} - Item: ${item}, possibility: ${pct}%`;
+            }).join('\n\n');
+        }
+
+        function toggleTsneImgFullscreen(modelNum) {
+            const section = document.getElementById(`tsne-img-section-${modelNum}`);
+            const wrap = document.getElementById(`tsne-img-wrapper-${modelNum}`);
+            const icon = document.getElementById(`tsne-img-fs-icon-${modelNum}`);
+            if (!section || !wrap) return;
+
+            const isFS = section.classList.contains('fixed');
+            
+            if (isFS) {
+                // Exit Fullscreen
+                section.classList.remove('fixed', 'inset-0', 'w-screen', 'h-[100dvh]', 'z-[9999]', 'rounded-none', 'm-0');
+                section.classList.add('rounded-2xl', 'flex-1', 'min-h-[250px]');
+                wrap.classList.remove('flex-[1_1_0%]', 'min-h-0');
+                if (icon) icon.textContent = 'fullscreen';
+                document.body.style.overflow = '';
+            } else {
+                // Enter Fullscreen
+                section.classList.add('fixed', 'inset-0', 'w-screen', 'h-[100dvh]', 'z-[9999]', 'rounded-none', 'm-0');
+                section.classList.remove('rounded-2xl', 'flex-1', 'min-h-[250px]');
+                wrap.classList.add('flex-[1_1_0%]', 'min-h-0');
+                if (icon) icon.textContent = 'fullscreen_exit';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function toggleTsneFullscreen(modelNum) {
+            const section = document.getElementById(`tsne-section-${modelNum}`);
+            const wrap = document.getElementById(`tsne-wrapper-${modelNum}`);
+            const icon = document.getElementById(`tsne-fs-icon-${modelNum}`);
+            if (!section || !wrap) return;
+
+            const isFS = section.classList.contains('fixed');
+            
+            if (isFS) {
+                // Exit Fullscreen
+                section.classList.remove('fixed', 'inset-0', 'w-screen', 'h-[100dvh]', 'z-[9999]', 'rounded-none', 'm-0');
+                section.classList.add('rounded-2xl', 'min-h-[300px]');
+                wrap.classList.remove('flex-[1_1_0%]', 'min-h-0');
+                if (icon) icon.textContent = 'fullscreen';
+                document.body.style.overflow = '';
+            } else {
+                // Enter Fullscreen
+                section.classList.add('fixed', 'inset-0', 'w-screen', 'h-[100dvh]', 'z-[9999]', 'rounded-none', 'm-0');
+                section.classList.remove('rounded-2xl', 'min-h-[300px]');
+                wrap.classList.add('flex-[1_1_0%]', 'min-h-0');
+                if (icon) icon.textContent = 'fullscreen_exit';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function showTsneChart(modelNum, tsne, slide = null) {
+            // Show the t-SNE section
+            document.getElementById(`tsne-section-${modelNum}`).style.display = 'flex';
+
+            const ctx = document.getElementById(`tsne-chart${modelNum}`).getContext('2d');
+
+            if (tsneChartInstances[modelNum]) {
+                tsneChartInstances[modelNum].destroy();
+            }
+
+            const inputClass = slide?.majority_class || 'Unknown';
+            const inputIdx = (slide?.index !== undefined) ? slide.index + 1 : 1;
+            const inputLabel = `#${inputIdx} ${inputClass}`;
+
+            const input = Array.isArray(tsne?.input) ? tsne.input : null;
+            const neighbors = Array.isArray(tsne?.neighbors) ? tsne.neighbors : [];
+            const centroids = Array.isArray(tsne?.centroids) ? tsne.centroids : [];
+
+            const inputData = input ? [{ x: input[0], y: input[1] }] : [];
+            const neighborData = neighbors
+                .filter(n => Array.isArray(n?.coord) && n.coord.length >= 2)
+                .map(n => {
+                    const pathStr = (n.path ?? '').toString();
+                    const parts = pathStr.replace(/\\/g, '/').split('/').filter(Boolean);
+                    const last = parts.length ? parts[parts.length - 1] : 'Unknown';
+                    const item = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                    const possibility = ((Number(n.score ?? 0)) * 100);
+                    return {
+                        x: n.coord[0],
+                        y: n.coord[1],
+                        item: item || 'Unknown',
+                        possibility
+                    };
+                });
+
+            const centroidData = centroids
+                .filter(c => Array.isArray(c?.coord) && c.coord.length >= 2)
+                .map(c => {
+                    return {
+                        x: c.coord[0],
+                        y: c.coord[1],
+                        item: c.class + " (Centroid)",
+                        isCentroid: true
+                    };
+                });
+
+            const adjustedNeighborData = neighborData.map(d => {
+                if (!input) return { ...d };
+                const ix = input[0], iy = input[1];
+                const dx = d.x - ix;
+                const dy = d.y - iy;
+                const norm = Math.hypot(dx, dy) || 1e-9;
+                const p = Math.max(0, Math.min(100, Number(d.possibility ?? 0)));
+                const desiredRadius = 1.0 - (p / 100); 
+                const scale = 6;
+                const r = desiredRadius * scale;
+                const nx = ix + (dx / norm) * r;
+                const ny = iy + (dy / norm) * r;
+                return { x: nx, y: ny, item: d.item, possibility: d.possibility };
+            });
+
+            // Adjust centroids as well relative to input
+            const adjustedCentroidData = centroidData.map(d => {
+                if (!input) return { ...d };
+                const ix = input[0], iy = input[1];
+                const dx = d.x - ix;
+                const dy = d.y - iy;
+                const norm = Math.hypot(dx, dy) || 1e-9;
+                // Using a neutral possibility or fixed distance scale for centroids
+                const desiredRadius = 1.0; 
+                const scale = 6;
+                const r = desiredRadius * scale;
+                const nx = ix + (dx / norm) * r;
+                const ny = iy + (dy / norm) * r;
+                return { x: nx, y: ny, item: d.item, isCentroid: true };
+            });
+
+            const uniqueItems = [...new Set(adjustedNeighborData.map(d => d.item))];
+            function colorForIndex(i) {
+                const hue = (i * 47) % 360; 
+                return `hsl(${hue}, 70%, 50%)`;
+            }
+
+            const datasets = [];
+
+            datasets.push({
+                label: inputLabel,
+                data: inputData,
+                pointRadius: 6,
+                pointStyle: 'circle',
+                backgroundColor: 'red',
+                borderColor: 'black',
+                borderWidth: 1
+            });
+
+            // Draw all centroids as a single dataset to avoid legend clutter
+            if (adjustedCentroidData.length > 0) {
+                datasets.push({
+                    label: 'Class Centroids',
+                    data: adjustedCentroidData,
+                    pointRadius: 8,
+                    pointStyle: 'rectRot',
+                    backgroundColor: 'rgba(70, 70, 70, 0.8)',
+                    borderColor: '#ffffff',
+                    borderWidth: 1
+                });
+            }
+
+            uniqueItems.forEach((item, idx) => {
+                const color = colorForIndex(idx);
+                const dataPoints = adjustedNeighborData.filter(d => d.item === item).map(d => ({ x: d.x, y: d.y, item: d.item, possibility: d.possibility }));
+                datasets.push({
+                    label: item,
+                    data: dataPoints,
+                    pointRadius: (ctx) => {
+                        const raw = ctx.raw || {};
+                        const p = Number(raw.possibility ?? 0);
+                        return Math.max(4, Math.min(12, 4 + p / 15));
+                    },
+                    backgroundColor: color,
+                    borderColor: color,
+                    borderWidth: 1
+                });
+            });
+
+            const pointLabelPlugin = {
+                id: 'pointLabelPlugin',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    ctx.save();
+                    ctx.font = '12px sans-serif';
+                    ctx.fillStyle = '#111';
+                    ctx.textBaseline = 'middle';
+
+                    const top = adjustedNeighborData
+                        .slice()
+                        .sort((a, b) => (b.possibility ?? 0) - (a.possibility ?? 0))
+                        .slice(0, 5);
+
+                    for (const pt of top) {
+                        const xPixel = chart.scales.x.getPixelForValue(pt.x);
+                        const yPixel = chart.scales.y.getPixelForValue(pt.y);
+                        ctx.fillText(String(pt.item ?? ''), xPixel + 6, yPixel);
+                    }
+
+                    if (inputData.length) {
+                        const xPixel = chart.scales.x.getPixelForValue(inputData[0].x);
+                        const yPixel = chart.scales.y.getPixelForValue(inputData[0].y);
+                        ctx.fillText(inputLabel, xPixel + 6, yPixel);
+                    }
+
+                    // Display centroid names optionally, but maybe only the top connected ones
+                    for (const cPt of adjustedCentroidData) {
+                        const xPixel = chart.scales.x.getPixelForValue(cPt.x);
+                        const yPixel = chart.scales.y.getPixelForValue(cPt.y);
+                        // Make font a bit distinct for centroids
+                        ctx.save();
+                        ctx.font = 'bold 11px sans-serif';
+                        ctx.fillStyle = '#444';
+                        ctx.fillText(String(cPt.item ?? ''), xPixel + 8, yPixel - 6);
+                        ctx.restore();
+                    }
+                    
+                    ctx.restore();
+                }
+            };
+
+            tsneChartInstances[modelNum] = new Chart(ctx, {
+                type: 'scatter',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    const raw = ctx.raw || {};
+                                    if (ctx.dataset.label === inputLabel) return `${inputLabel} (Your image)`;
+                                    if (ctx.dataset.label === 'Class Centroids') return `${raw.item}`;
+                                    const item = ctx.dataset.label ?? (raw.item ?? 'Unknown');
+                                    const poss = Number(raw.possibility ?? 0).toFixed(1);
+                                    return `Item: ${item}, possibility: ${poss}%`;
+                                }
+                            }
+                        },
+                        legend: { display: true }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: { display: true, text: 't-SNE X', color: '#666', font: { size: 12 } },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        y: {
+                            display: true,
+                            title: { display: true, text: 't-SNE Y', color: '#666', font: { size: 12 } },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        }
+                    }
+                },
+                plugins: [pointLabelPlugin]
+            });
+        }
+
+        function showBarChart(modelNum, matches) {
+            const ctx = document.getElementById(`chart${modelNum}`).getContext('2d');
+
+            function extractItemName(desc) {
+                if (!desc) return 'Unknown';
+                const s = desc.toString();
+                const afterColon = s.includes(':') ? s.split(':').slice(1).join(':').trim() : s.trim();
+                const parts = afterColon.replace(/\\/g, '/').split('/').filter(Boolean);
+                if (parts.length === 0) return 'Unknown';
+                const last = parts[parts.length - 1];
+                const base = last.includes('.') ? last.substring(0, last.lastIndexOf('.')) : last;
+                return base || 'Unknown';
+            }
+
+            const descriptions = matches.map(m => extractItemName((m.description ?? m.label ?? '').toString().trim()));
+            const confidences = matches.map(m => (m.confidence ?? m.score ?? 0) * 100);
+
+            if (chartInstances[modelNum]) {
+                chartInstances[modelNum].destroy();
+            }
+
+            chartInstances[modelNum] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: descriptions,
+                    datasets: [{
+                        label: 'Possibility (%)',
+                        data: confidences,
+                        backgroundColor: '#2b3896',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function setTheme(theme) {
+            localStorage.setItem('selectedTheme', theme);
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+
+        async function fetchModelNames() {
+            const headers = { 
+                'ngrok-skip-browser-warning': '1', 
+                'bypass-tunnel-reminder': '1' 
+            };
+            try {
+                const res1 = await fetch(`${backend1}/health`, { headers });
+                if (res1.ok) {
+                    const data1 = await res1.json();
+                    if (data1.ckpt) {
+                        const name = data1.ckpt.split(/[/\\]/).pop();
+                        document.getElementById('model1-name').textContent = `Model 1: ${name}`;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('model1-name').textContent = "Model 1: Offline";
+            }
+
+            try {
+                const res2 = await fetch(`${backend2}/health`, { headers });
+                if (res2.ok) {
+                    const data2 = await res2.json();
+                    if (data2.ckpt) {
+                        const name = data2.ckpt.split(/[/\\]/).pop();
+                        document.getElementById('model2-name').textContent = `Model 2: ${name}`;
+                    }
+                }
+            } catch (e) {
+                document.getElementById('model2-name').textContent = "Model 2: Offline";
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('selectedTheme');
+            if (savedTheme) {
+                setTheme(savedTheme);
+            }
+            initNnSlideControls();
+            fetchModelNames();
+        });
+    </script>
+</body>
+</html>
