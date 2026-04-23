@@ -16,6 +16,10 @@ Open this link and use the program directly:
 ```text
 https://chamtgm.github.io/SEGP-RunService/main.html
 ```
+or do local frontend startup
+```text
+Run npm start in webapp1/frontend directory
+```
 
 No local frontend deployment is required.
 
