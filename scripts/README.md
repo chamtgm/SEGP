@@ -5,12 +5,11 @@ This guide matches the current `scripts/python_model_service.py` behavior.
 ## 🚦 Choose Your Path
 
 - ✅ I only want to use the app now: go to **Path A**
-- 🛠️ I want to run backend locally: go to **Path B**
-- 🌍 I want public access to my own local backend: go to **Path C (Optional)**
+- 🌍 I want public access to my own local backend: go to **Path B (Optional)**
 
 ---
 
-## Path A: Use The App Now (No Setup)
+## Path A (Part 1): Use The App Now (No Setup)
 
 Open this link and use the program directly:
 
@@ -22,7 +21,7 @@ No local frontend deployment is required.
 
 ---
 
-## Path B: Run Backend Locally
+## Path A (Part 2): Run Backend Locally
 
 ### Prerequisites
 
@@ -78,7 +77,7 @@ curl http://127.0.0.1:8002/health
 
 ---
 
-## Path C: Optional ngrok Tunnels (For Public Access To Local Backends)
+## Path B: Optional ngrok Tunnels (For Public Access To Local Backends)
 
 Only needed if you want your own local backend to be reachable from the deployed frontend.
 
