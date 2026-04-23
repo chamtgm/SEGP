@@ -1,3 +1,4 @@
+:exclamation: All codes here were written by group members in Group 5 only.
 # 🌟 SEGP Project Navigator
 
 Welcome to the SEGP workspace 👋
