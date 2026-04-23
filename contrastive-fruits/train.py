@@ -96,7 +96,7 @@ def main():
         pbar = tqdm(loader, desc=f"Epoch {epoch}/{args.epochs}")
         running_loss = 0.0
         for batch in pbar:
-            v1, v2, vcf = batch
+            v1, v2, vcf, _ = batch
             v1 = v1.to(device)
             v2 = v2.to(device)
             vcf = vcf.to(device)
