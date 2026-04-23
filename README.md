@@ -13,6 +13,7 @@ Tick the one that matches what you want to do now:
 - [ ] 🎯 Work on fruit object detection datasets or detector training
 - [ ] 🍎 Work on contrastive learning, embeddings, or model evaluation
 - [ ] 🔌 Work on API/model-serving logic
+- [ ] 📥 Get the project dataset from Kaggle
 
 Then use the map below 👇
 
@@ -20,15 +21,30 @@ Then use the map below 👇
 
 | If your goal is... | Go to folder | Open this guide next |
 |---|---|---|
-| 🖥️ Web interface and frontend experience | [webapp1](webapp1) | [webapp1/README.md](webapp1/README.md) |
+| 🖥️ Web interface and frontend experience | [webapp](webapp) | [webapp/README.md](webapp/README.md) |
 | 🎯 Detection labels, YOLO dataset flow, detector outputs | [Object Detection](Object%20Detection) | [Object Detection/README.md](Object%20Detection/README.md) |
 | 🍎 Self-supervised learning and classifier quality | [contrastive-fruits](contrastive-fruits) | [contrastive-fruits/README.md](contrastive-fruits/README.md) |
 | 🔌 Inference service and API behavior | [scripts](scripts) | [scripts/README.md](scripts/README.md) |
+| 📥 Dataset source and download | [SEGP Dataset (Kaggle)](https://www.kaggle.com/datasets/chamtgm/segp-dataset) | Use folder guides above for expected placement by workflow |
+
+## 📥 Dataset Category
+
+Project dataset source:
+
+- Get your dataset here -> [SEGP Dataset on Kaggle](https://www.kaggle.com/datasets/chamtgm/segp-dataset)
+
+Why this matters:
+
+- 🎯 Object Detection workflows depend on dataset images for annotation and YOLO dataset generation.
+- 🍎 contrastive-fruits workflows depend on dataset images for training and evaluation pipelines.
+- 🔌 scripts/service workflows use model artifacts produced from those datasets.
+
+After downloading, follow the folder-specific README for structure and expected dataset locations.
 
 ## 📦 Folder Spotlights (Expandable)
 
 <details>
-<summary><strong>🖥️ webapp1</strong> - User-facing web experience</summary>
+<summary><strong>🖥️ webapp</strong> - User-facing web experience</summary>
 
 What it contains:
 - 🎨 Browser UI pages and styling
@@ -40,7 +56,7 @@ What it is responsible for:
 - 🌉 Connecting UI actions to backend service endpoints
 
 Where to continue:
-- 📘 [webapp1/README.md](webapp1/README.md)
+- 📘 [webapp/README.md](webapp/README.md)
 
 </details>
 
@@ -99,7 +115,7 @@ Where to continue:
 Use this README for navigation.
 
 For any implementation, configuration, or execution detail, always follow the README inside the specific folder:
-- 🖥️ [webapp1/README.md](webapp1/README.md)
+- 🖥️ [webapp/README.md](webapp/README.md)
 - 🎯 [Object Detection/README.md](Object%20Detection/README.md)
 - 🍎 [contrastive-fruits/README.md](contrastive-fruits/README.md)
 - 🔌 [scripts/README.md](scripts/README.md)
