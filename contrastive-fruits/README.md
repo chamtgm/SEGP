@@ -99,7 +99,7 @@ Run the primary contrastive learning script bridging the dataset and the HVAE st
 python contrastive-fruits\train.py --fruit-root "Datasets" --style-root "Apple_dataset_splits/train" --epochs 300 --batch-size 32 --style-method hvae --hvae-ckpt "D:\Study materials\Year 2\SEGP\Code\contrastive-fruits\hvae_checkpoints\hvae_epoch_20.pt" --save-dir "D:\Study materials\Year 2\SEGP\Code\contrastive-fruits\cfsimclr_checkpoints" --device cuda
 ```
 
-### 4️⃣ Evaluate (Linear Probe/Fine-tuning)
+### 4️⃣ Evaluate (Linear Probe/Fine-tuning) (Use the testing dataset in Kaggle)
 Freeze the backbone and test classification accuracy:
 #### Linear Probe
 ```powershell
