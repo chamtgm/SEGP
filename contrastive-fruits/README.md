@@ -107,7 +107,7 @@ python contrastive-fruits\linear_probe.py --fruit-root "D:\Study materials\Year 
 ```
 #### Fine-tuning
 ```powershell
-python contrastive-fruits\fine_tune.py --fruit-root "D:\Study materials\Year 2\SEGP\Code\Datasets" --probe-ckpt "D:\Study materials\Year 2\SEGP\Code\contrastive-fruits\linear_probe_best(base_simclr).pt" --simclr-ckpt "D:\Study materials\Year 2\SEGP\Code\contrastive-fruits\ckpt_epoch_100(base_simclr).pt" --epoch 20 --device cuda --save-dir "D:\Study materials\Year 2\SEGP\Code\fine_tuned_models
+python contrastive-fruits\fine_tune.py --fruit-root "C:\Users\User\Downloads\SEGP-main (1)\SEGP-main\Datasets - Copy" --probe-ckpt "C:\Users\User\Downloads\SEGP-main (1)\SEGP-main\linear_probe_best.pt" --simclr-ckpt "C:\Users\User\Downloads\SEGP-main (1)\SEGP-main\ckpt_epoch_100.pt" --epoch 20 --device cuda --save-dir "D:\Study materials\Year 2\SEGP\Code\fine_tuned_models
 ```
 
 ---
