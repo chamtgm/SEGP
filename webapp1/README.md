@@ -42,6 +42,7 @@ http://127.0.0.1:8080/main.html
 ```
 
 ### C) Run Local Model Backends For Frontend
+For the gallery-root parameter setting, use the "Fruit Images Training" dataset<br/>
 
 The frontend reads backend URLs from constants in `webapp1/frontend/main.html`:
 
