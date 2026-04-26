@@ -7,7 +7,7 @@ This README applies to `SEGP-main/scripts/python_model_service.py`.
 - `python_model_service.py`: Flask API for embeddings, prediction, nearest neighbors, and heatmaps.
 
 ## Start The Service
-For the gallery-root parameter setting, use the "Fruit Images Training" dataset
+For the gallery-root parameter setting, use the "Fruit Images Training" dataset <br/>
 Run from repository root (`SEGP-main`):
 
 ```powershell
