@@ -27,7 +27,7 @@ Then use the map below 👇
 | 🍎 Self-supervised learning and classifier quality | [contrastive-fruits](contrastive-fruits) | [contrastive-fruits/README.md](contrastive-fruits/README.md) |
 | 🔌 Inference service and API behavior | [scripts](scripts) | [scripts/README.md](scripts/README.md) |
 | 📥 Dataset source and download | [SEGP Dataset (Kaggle)](https://www.kaggle.com/datasets/chamtgm/segp-dataset) | Use folder guides above for expected placement by workflow |
-| 🤖 Only testing backend and frontend with prepared model | [SEGP Trained Models (Kaggle)](https://www.kaggle.com/datasets/chamtgm/segp-trained-models) |
+| 🤖 Only testing backend and frontend with prepared model | [SEGP Trained Models (Kaggle)](https://www.kaggle.com/datasets/chamtgm/segp-trained-models) | CFSIMCLR_finetuned_best.pt -> Proposed model <br />simCLR_finetuned_best.pt -> Baseline Model <br/>best.pt ->YOLO model 
 
 ## 📥 Dataset Category
 
