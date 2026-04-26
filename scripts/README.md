@@ -81,7 +81,7 @@ curl http://127.0.0.1:8002/health
 
 ---
 
-## Path B: Optional ngrok Tunnels (For Public Access To Local Backends)
+## Path B: ngrok Tunnels Initialisation for Accessing Deployed Frontend (For Public Access To Local Backends)
 
 Only needed if you want your own local backend to be reachable from the deployed frontend.
 
