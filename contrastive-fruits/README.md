@@ -68,18 +68,7 @@ python fine_tune.py --fruit-root "<path-to-fruit-dataset>" --simclr-ckpt "cfsimc
 
 Output: `finetune_checkpoints/finetuned_best.pt`
 
-### 5) Evaluate Probe
-
-```powershell
-python eval_probe.py --fruit-root "<path-to-fruit-dataset>" --ckpt-dir "cfsimclr_checkpoints" --device cpu
-```
-
-Outputs include:
-
-- `confusion_matrix.png`
-- `per_class_metrics.csv`
-
-### 6) Generate Centroids
+### 5) Generate Centroids
 
 ```powershell
 python generate_centroids.py --train-root "<path-to-train-dataset>" --ckpt "cfsimclr_checkpoints/ckpt_epoch_100.pt" --out "fruit_centroids.pt" --device cpu
